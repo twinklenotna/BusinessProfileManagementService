@@ -1,6 +1,5 @@
 package com.example.BusinessProfileManagement.config;
 
-import com.example.BusinessProfileManagement.model.enums.Product;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

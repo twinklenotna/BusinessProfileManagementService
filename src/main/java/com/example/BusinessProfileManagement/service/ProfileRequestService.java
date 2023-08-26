@@ -58,7 +58,7 @@ public class ProfileRequestService {
     }
   }
 
-  BusinessProfileRequestEntity createBusinessProfileRequestEntity(BusinessProfile profile, RequestType requestType, Set<String> subscriptions) {
+  BusinessProfileRequest createBusinessProfileRequest(BusinessProfile profile, RequestType requestType, Set<String> subscriptions) {
     BusinessProfileRequestEntity requestEntity = new BusinessProfileRequestEntity();
     requestEntity.setBusinessProfile(businessProfilePatchMapper.dtoToEntity(profile));
     requestEntity.setProfileId(profile.getProfileId());
@@ -66,7 +66,7 @@ public class ProfileRequestService {
     requestEntity.setRequestType(requestType);
     requestEntity.setSubscriptions(subscriptions);
     try{
-      return _businessProfileRequestRepository.saveAndUpdate(requestEntity);
+       return _businessProfileRequestMapper.entityToDto(_businessProfileRequestRepository.saveAndUpdate(requestEntity));
     } catch(Exception ex) {
       logger.error("Error happened while creating request with requestId for profileId: "+ profile.getProfileId() + " " +ex.getMessage());
       throw new RuntimeException("Error happened while creating request with requestId for profileId: "+ profile.getProfileId() + " " +ex.getMessage(), ex);

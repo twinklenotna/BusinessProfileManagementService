@@ -55,12 +55,12 @@ public class BusinessProfileServiceTest {
     BusinessProfileRequest businessProfileRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.UPDATE);
 
-    when(profileRequestService.createBusinessProfileRequestEntity(profile, RequestType.UPDATE, new HashSet<>()))
-        .thenReturn(businessProfileRequestMapper.dtoToEntity(businessProfileRequest));
+    when(profileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>()))
+        .thenReturn(businessProfileRequest);
 
     businessProfileService.updateProfile(profile);
 
-    verify(profileRequestService, times(1)).createBusinessProfileRequestEntity(any(), any(), any());
+    verify(profileRequestService, times(1)).createBusinessProfileRequest(any(), any(), any());
     verify(profileUpdateRequestProducer, times(1)).sendProfileUpdateRequestWithKey(any(), any());
   }
 
@@ -72,8 +72,8 @@ public class BusinessProfileServiceTest {
     BusinessProfileEntity businessProfileEntity = businessProfileMapper.dtoToEntity(profile);
 
     when(profileRepository.save(any())).thenReturn(businessProfileEntity);
-    when(profileRequestService.createBusinessProfileRequestEntity(profile, RequestType.CREATE, new HashSet<>()))
-        .thenReturn(businessProfileRequestMapper.dtoToEntity(businessProfileRequest));
+    when(profileRequestService.createBusinessProfileRequest(profile, RequestType.CREATE, new HashSet<>()))
+        .thenReturn(businessProfileRequest);
 
     String profileId = businessProfileService.createProfileRequest(profile);
 

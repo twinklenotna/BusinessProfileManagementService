@@ -5,7 +5,10 @@ import com.example.BusinessProfileManagement.exception.BusinessProfileValidation
 import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
-//import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.example.BusinessProfileManagement.service.ProfileRequestService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.http.*;
@@ -14,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 public class DefaultProductClient implements ProductClient {
+  Logger logger = LoggerFactory.getLogger(DefaultProductClient.class);
   private final ProductUrlMapConfig productUrlMapConfig;
   private final RestTemplate restTemplate;
 
@@ -23,7 +27,7 @@ public class DefaultProductClient implements ProductClient {
     this.restTemplate = restTemplate;
   }
 
-//  @HystrixCommand(fallbackMethod = "defaultApprovalStatus")
+  @HystrixCommand(fallbackMethod = "defaultApprovalStatus")
   @Override
   public BusinessProfileRequestProductValidation getApproval(String product, BusinessProfile profile) {
     String baseUrl = productUrlMapConfig.getUrl().getOrDefault(product, "defaultUrlForUnknownProduct");
@@ -37,7 +41,7 @@ public class DefaultProductClient implements ProductClient {
       businessProfileRequestProductValidation.setStatus(response.getBody());
       return businessProfileRequestProductValidation;
     } catch (BusinessProfileValidationClientException ex) {
-      // Log exception
+      logger.error("Unable to validate request against productId: "+ product);
       businessProfileRequestProductValidation.setStatus(ApprovalStatus.FAILED);
       return businessProfileRequestProductValidation;
     }

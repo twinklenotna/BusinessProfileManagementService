@@ -16,10 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProfileValidationService {
+  Logger logger = LoggerFactory.getLogger(ProfileValidationService.class);
   final BusinessProfileRequestProductValidationRepository _businessProfileRequestProductValidationRepository;
   final ProductValidationFactory _productValidationFactory;
   final BusinessProfileService _businessProfileService;
@@ -40,6 +43,7 @@ public class ProfileValidationService {
 
   @Transactional
   public boolean validateRequest(BusinessProfileRequest request) {
+    logger.debug("Started Validation for requestId: "+ request);
     enrichRequest(request);
     List<CompletableFuture<BusinessProfileRequestProductValidation>> validationTasks = new ArrayList<>();
     for (String product : request.getSubscriptions()) {
@@ -49,14 +53,13 @@ public class ProfileValidationService {
       validationTasks.add(validationTask);
     }
     CompletableFuture<Void> allOf = CompletableFuture.allOf(validationTasks.toArray(new CompletableFuture[0]));
-    // Process the validation results after all tasks are completed
     AtomicBoolean allApproved = new AtomicBoolean(true);
     allOf.thenRun(() -> {
       for (CompletableFuture<BusinessProfileRequestProductValidation> validationTask : validationTasks) {
         try {
           BusinessProfileRequestProductValidation validation = validationTask.get();
           if (validation.getStatus().equals(ApprovalStatus.FAILED)) {
-            // Handle the case where validation failed
+            logger.error("Validation failed for requestId: "+ request);
             throw new BusinessProfileValidationException("Failed to validate request with requestId: " + request.getRequestId() +
                 " with product: " + validation.getProductId());
           } else if (validation.getStatus().equals(ApprovalStatus.REJECTED)) {
@@ -66,8 +69,8 @@ public class ProfileValidationService {
           throw new BusinessProfileValidationException(e.getMessage(),e);
         }
       }
-
     });
+    logger.debug("Validation completed for requestId: "+ request+ " with status: "+ allApproved.get());
     return allApproved.get();
   }
 

@@ -3,8 +3,8 @@ package com.example.BusinessProfileManagement.service;
 import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundException;
 import com.example.BusinessProfileManagement.kafka.ProfileUpdateRequestProducer;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
-import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequestEntity;
 import com.example.BusinessProfileManagement.model.enums.ProfileStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileMapper;
@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Service
 public class BusinessProfileService {
@@ -40,23 +39,24 @@ public class BusinessProfileService {
   }
 
   public void updateProfile(BusinessProfile profile) {
-    BusinessProfileRequestEntity businessProfileRequestEntity =
-        profileRequestService.createBusinessProfileRequestEntity(profile, RequestType.UPDATE, new HashSet<>());
-    sendProfileUpdateRequest(businessProfileRequestEntity);
+    BusinessProfileRequest businessProfileRequest =
+        profileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>());
+    logger.info("created profile request with id: " + businessProfileRequest.getRequestId());
+    sendProfileUpdateRequest(businessProfileRequest);
   }
 
   public void updateProfile(BusinessProfile profile, Set<String> subscriptions) {
-    BusinessProfileRequestEntity businessProfileRequestEntity =
-        profileRequestService.createBusinessProfileRequestEntity(profile, RequestType.UPDATE, subscriptions);
-    sendProfileUpdateRequest(businessProfileRequestEntity);
+    BusinessProfileRequest businessProfileRequest =
+        profileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, subscriptions);
+    sendProfileUpdateRequest(businessProfileRequest);
   }
 
   @Transactional
   public String createProfileRequest(BusinessProfile profile) {
     BusinessProfileEntity businessProfileEntity = createBusinessProfileEntity(profile);
-    BusinessProfileRequestEntity businessProfileRequestEntity =
-        profileRequestService.createBusinessProfileRequestEntity(profile, RequestType.UPDATE, new HashSet<>());
-    sendProfileUpdateRequest(businessProfileRequestEntity);
+    BusinessProfileRequest businessProfileRequest =
+        profileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>());
+    sendProfileUpdateRequest(businessProfileRequest);
     return businessProfileEntity.getProfileId();
   }
 
@@ -70,17 +70,12 @@ public class BusinessProfileService {
   }
 
   public BusinessProfile getProfileById(String profileId) {
-    try {
-      BusinessProfileEntity profileEntity = profileRepository.getProfileById(profileId);
-      if(profileEntity == null) {
-        throw new BusinessProfileNotFoundException("Business profile with id: " + profileId + " not found");
-      }
-      return businessProfileMapper.entityToDto(profileEntity);
-    } catch(Exception ex) {
+    BusinessProfileEntity profileEntity = profileRepository.getProfileById(profileId);
+    if(profileEntity == null) {
       logger.warn("Business profile with id: " + profileId + " not found");
       throw new BusinessProfileNotFoundException("Business profile with id: " + profileId + " not found");
     }
-
+    return businessProfileMapper.entityToDto(profileEntity);
   }
 
   private BusinessProfileEntity createBusinessProfileEntity(BusinessProfile profile) {
@@ -95,10 +90,10 @@ public class BusinessProfileService {
     return profileRepository.save(profileEntity);
   }
 
-  public void sendProfileUpdateRequest(BusinessProfileRequestEntity requestEntity) {
+  public void sendProfileUpdateRequest(BusinessProfileRequest request) {
     profileUpdateRequestProducer.sendProfileUpdateRequestWithKey(
-        requestEntity.getProfileId(),
-        businessProfileRequestMapper.entityToDto(requestEntity));
+        request.getProfileId(),
+        request);
   }
 }
 

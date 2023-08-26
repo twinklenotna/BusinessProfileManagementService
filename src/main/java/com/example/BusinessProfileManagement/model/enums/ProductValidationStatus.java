@@ -1,8 +1,8 @@
 package com.example.BusinessProfileManagement.model.enums;
 
-public enum ApprovalStatus {
-  IN_PROGRESS,
+public enum ProductValidationStatus {
   APPROVED,
   REJECTED,
-  FAILED
+  TIMEOUT,
+  ERROR
 }

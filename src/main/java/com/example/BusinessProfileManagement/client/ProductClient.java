@@ -1,14 +1,18 @@
 package com.example.BusinessProfileManagement.client;
 
-import com.example.BusinessProfileManagement.model.ProfileUpdateRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
-import com.example.BusinessProfileManagement.model.enums.Product;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
 
 
 @Component
 public interface ProductClient {
-  CompletableFuture<ApprovalStatus> getApproval(Product product, ProfileUpdateRequest profileId);
+  BusinessProfileRequestProductValidation getApproval(String product, BusinessProfile profileId);
+  default BusinessProfileRequestProductValidation defaultApprovalStatus(String product, BusinessProfile profile) {
+    BusinessProfileRequestProductValidation fallbackValidation = new BusinessProfileRequestProductValidation();
+    fallbackValidation.setProductId(product);
+    fallbackValidation.setStatus(ApprovalStatus.FAILED);
+    return fallbackValidation;
+  }
 }

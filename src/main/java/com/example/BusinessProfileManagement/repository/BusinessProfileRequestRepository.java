@@ -28,19 +28,21 @@ public class BusinessProfileRequestRepository {
   }
 
   public List<BusinessProfileRequestEntity> findByProfileId(String profileId) {
-    String gsiName = "profileId";
-    String gsiPartitionKey = "profileId";
+    String gsiName = "profileId-index";
 
-    Map<String, AttributeValue> eav = new HashMap<>();
-    eav.put(":val1", new AttributeValue().withS(gsiPartitionKey));
+    BusinessProfileRequestEntity businessProfileRequestEntity = new BusinessProfileRequestEntity();
+    businessProfileRequestEntity.setProfileId(profileId);
 
-    DynamoDBQueryExpression<BusinessProfileRequestEntity> queryExpression = new DynamoDBQueryExpression<BusinessProfileRequestEntity>()
-        .withIndexName(gsiName)
-        .withKeyConditionExpression("profileId = :val1")
-        .withExpressionAttributeValues(eav);
+    DynamoDBQueryExpression<BusinessProfileRequestEntity> queryExpression =
+        new DynamoDBQueryExpression<BusinessProfileRequestEntity>()
+            .withHashKeyValues(businessProfileRequestEntity)
+            .withIndexName(gsiName)
+            .withConsistentRead(false);
 
-    List<BusinessProfileRequestEntity> results = _dynamoDBMapper.query(BusinessProfileRequestEntity.class, queryExpression);
-    return results;
+
+    List<BusinessProfileRequestEntity> queryResult = _dynamoDBMapper.query(BusinessProfileRequestEntity.class, queryExpression);
+
+    return queryResult;
   }
 
   public BusinessProfileRequestEntity findByRequestId(String requestId) {

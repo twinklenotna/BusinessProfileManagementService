@@ -2,7 +2,6 @@ package com.example.BusinessProfileManagement.service.requestState;
 
 import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +12,7 @@ public class BusinessProfileRequestContext {
   private final ConsumerState approvedState;
   private final ConsumerState failedState;
   private final ConsumerState rejectedState;
-  private final ConsumerState inProgessState;
-
+  private final ConsumerState inProgressState;
 
   public BusinessProfileRequestContext(@Qualifier("approvedState") ConsumerState approvedState,
       @Qualifier("failedState") ConsumerState failedState, @Qualifier("rejectedState") ConsumerState rejectedState,
@@ -23,11 +21,12 @@ public class BusinessProfileRequestContext {
     this.approvedState = approvedState;
     this.failedState = failedState;
     this.rejectedState = rejectedState;
-    this.inProgessState = inProgessState;
+    this.inProgressState = inProgessState;
   }
 
   @Transactional
   public void processRequest(BusinessProfileRequest request) {
+    currentState = inProgressState;
     currentState.processRequest(request, this);
   }
 

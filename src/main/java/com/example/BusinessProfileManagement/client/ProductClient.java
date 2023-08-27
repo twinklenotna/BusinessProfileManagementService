@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public interface ProductClient {
   BusinessProfileRequestProductValidation getApproval(String product, BusinessProfile profileId);
-  default BusinessProfileRequestProductValidation defaultApprovalStatus(String product, BusinessProfile profile) {
+  default BusinessProfileRequestProductValidation defaultApprovalStatus(String product, BusinessProfile profile, Throwable throwable) {
     BusinessProfileRequestProductValidation fallbackValidation = new BusinessProfileRequestProductValidation();
     fallbackValidation.setProductId(product);
     fallbackValidation.setStatus(ApprovalStatus.FAILED);

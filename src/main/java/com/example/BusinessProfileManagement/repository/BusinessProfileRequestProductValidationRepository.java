@@ -26,10 +26,9 @@ public class BusinessProfileRequestProductValidationRepository  {
   }
 
   public List<BusinessProfileRequestProductValidationEntity> findByRequestId(String requestId) {
-    String partitionKey = "requestId";
 
     Map<String, AttributeValue> eav = new HashMap<>();
-    eav.put(":val1", new AttributeValue().withS(partitionKey));
+    eav.put(":val1", new AttributeValue().withS(requestId));
 
     DynamoDBQueryExpression<BusinessProfileRequestProductValidationEntity> queryExpression =
         new DynamoDBQueryExpression<BusinessProfileRequestProductValidationEntity>()

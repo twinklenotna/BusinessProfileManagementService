@@ -32,7 +32,7 @@ public class TaxInfoEncryptConverter implements DynamoDBTypeConverter<String, Ta
     try {
       return TaxInfo.fromJson(decrypt(encryptedData));
     } catch (Exception e) {
-      e.printStackTrace();
+//      e.printStackTrace();
       return null;
     }
   }

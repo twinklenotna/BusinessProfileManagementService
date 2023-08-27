@@ -11,8 +11,6 @@ public class FailedState implements ConsumerState {
   @Override
   public void processRequest(BusinessProfileRequest request,
       BusinessProfileRequestContext businessProfileRequestContext) {
-    // Perform actions specific to the FAILED state
     throw new BusinessProfileValidationException("could not validate client");
-    // Save or update the request
   }
 }

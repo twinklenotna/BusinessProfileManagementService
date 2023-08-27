@@ -5,7 +5,7 @@ import com.example.BusinessProfileManagement.exception.BusinessProfileValidation
 import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class DefaultProductClient implements ProductClient {
     this.restTemplate = restTemplate;
   }
 
-  @HystrixCommand(fallbackMethod = "defaultApprovalStatus")
+  @CircuitBreaker(name = "defaultApprovalStatus", fallbackMethod = "defaultApprovalStatus")
   @Override
   public BusinessProfileRequestProductValidation getApproval(String product, BusinessProfile profile) {
     String baseUrl = productUrlMapConfig.getUrl().getOrDefault(product, "defaultUrlForUnknownProduct");

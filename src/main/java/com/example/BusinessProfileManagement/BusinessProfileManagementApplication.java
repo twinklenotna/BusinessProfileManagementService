@@ -1,14 +1,14 @@
 package com.example.BusinessProfileManagement;
 
+//import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 @EnableCaching
-@EnableCircuitBreaker
+//@CircuitBreaker(name = "defaultApprovalStatus", fallbackMethod = "defaultApprovalStatus")
 public class BusinessProfileManagementApplication {
 
 	public static void main(String[] args) {

@@ -3,7 +3,7 @@ package com.example.BusinessProfileManagement.service;
 import com.example.BusinessProfileManagement.exception.BusinessProfileRequestException;
 import com.example.BusinessProfileManagement.exception.BusinessProfileRequestNotFoundException;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequestEntity;
@@ -16,54 +16,46 @@ import com.example.BusinessProfileManagement.repository.BusinessProfileRequestRe
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
 public class ProfileRequestService {
   Logger logger = LoggerFactory.getLogger(ProfileRequestService.class);
-  final BusinessProfileRequestRepository _businessProfileRequestRepository;
-  final BusinessProfileMapper businessProfileMapper;
-  final BusinessProfileRequestMapper _businessProfileRequestMapper;
-  final ProfileProductValidationService _profileProductValidationService;
-  final BusinessProfileRequestResponseMapper _businessProfileRequestResponseMapper;
+  private  final BusinessProfileRequestRepository businessProfileRequestRepository;
+  private  final BusinessProfileMapper businessProfileMapper;
+  private  final BusinessProfileRequestMapper businessProfileRequestMapper;
+  private  final ProfileProductValidationService profileProductValidationService;
+  private  final BusinessProfileRequestResponseMapper businessProfileRequestResponseMapper;
 
-  public ProfileRequestService(
-      BusinessProfileRequestRepository businessProfileRequestRepository,
-      BusinessProfileMapper businessProfileMapper, BusinessProfileRequestMapper businessProfileRequestMapper,
-      ProfileProductValidationService profileProductValidationService,
-      BusinessProfileRequestResponseMapper businessProfileRequestResponseMapper) {
-    _businessProfileRequestRepository = businessProfileRequestRepository;
-    this.businessProfileMapper = businessProfileMapper;
-    _businessProfileRequestMapper = businessProfileRequestMapper;
-    _profileProductValidationService = profileProductValidationService;
-    _businessProfileRequestResponseMapper = businessProfileRequestResponseMapper;
-  }
 
-  public List<BusinessProfileRequest> getProfileRequestByProfileId(String profileId) {
-    List<BusinessProfileRequestEntity> businessProfileRequestEntities = _businessProfileRequestRepository.findByProfileId(profileId);
-    List<BusinessProfileRequest> businessProfileRequests = new ArrayList<>();
+  public List<BusinessProfileUpdateRequest> getProfileUpdateRequestsByProfileId(String profileId) {
+    List<BusinessProfileRequestEntity> businessProfileRequestEntities = businessProfileRequestRepository.findByProfileId(profileId);
+    List<BusinessProfileUpdateRequest> businessProfileUpdateRequests = new ArrayList<>();
     for(BusinessProfileRequestEntity businessProfileRequestEntity : businessProfileRequestEntities) {
-      businessProfileRequests.add(_businessProfileRequestMapper.entityToDto(businessProfileRequestEntity));
+      businessProfileUpdateRequests.add(businessProfileRequestMapper.entityToDto(businessProfileRequestEntity));
     }
-    return businessProfileRequests;
+    return businessProfileUpdateRequests;
   }
 
-  public BusinessProfileRequestResponse getProfileRequest(String requestId) {
-    BusinessProfileRequestEntity requestEntity = _businessProfileRequestRepository.findByRequestId(requestId);
+  public BusinessProfileRequestResponse getProfileUpdateRequest(String requestId) {
+    BusinessProfileRequestEntity requestEntity = businessProfileRequestRepository.findByRequestId(requestId);
     List<BusinessProfileRequestProductValidation> businessProfileRequestProductValidations =
-        _profileProductValidationService.getRequestProductValidations(requestId);
+        profileProductValidationService.getRequestProductValidations(requestId);
     if(requestEntity == null) {
       logger.error("Business profile request with id: " + requestId + " not found");
       throw new BusinessProfileRequestNotFoundException("Business profile request with id: " + requestId + " not found");
     }
-    BusinessProfileRequestResponse response = _businessProfileRequestResponseMapper.entityToDto(requestEntity);
+    BusinessProfileRequestResponse response = businessProfileRequestResponseMapper.entityToDto(requestEntity);
     response.setSubscriptionValidations(businessProfileRequestProductValidations);
     return response;
   }
-  public void updateRequestStatus(BusinessProfileRequest request, ApprovalStatus status) {
+  public void updateRequestStatus(BusinessProfileUpdateRequest request, ApprovalStatus status) {
     try {
       request.setStatus(status);
       updateBusinessProfileRequestEntity(request);
@@ -77,23 +69,23 @@ public class ProfileRequestService {
     }
   }
 
-  BusinessProfileRequest createBusinessProfileRequest(BusinessProfile profile, RequestType requestType, Set<String> subscriptions) {
+  BusinessProfileUpdateRequest createBusinessProfileRequest(BusinessProfile profile, RequestType requestType, Set<String> subscriptions) {
     BusinessProfileRequestEntity requestEntity = new BusinessProfileRequestEntity();
-    requestEntity.setBusinessProfile(businessProfileMapper.dtoToEntity(profile));
+    requestEntity.setBusinessProfile(businessProfileMapper.toEntity(profile));
     requestEntity.setProfileId(profile.getProfileId());
     requestEntity.setStatus(ApprovalStatus.IN_PROGRESS);
     requestEntity.setRequestType(requestType);
     requestEntity.setSubscriptions(subscriptions);
     try{
-       return _businessProfileRequestMapper.entityToDto(_businessProfileRequestRepository.saveAndUpdate(requestEntity));
+       return businessProfileRequestMapper.entityToDto(businessProfileRequestRepository.saveAndUpdate(requestEntity));
     } catch(Exception ex) {
       logger.error("Error happened while creating request with requestId for profileId: "+ profile.getProfileId() + " " +ex.getMessage());
       throw new RuntimeException("Error happened while creating request with requestId for profileId: "+ profile.getProfileId() + " " +ex.getMessage(), ex);
     }
   }
 
-  public BusinessProfileRequestEntity updateBusinessProfileRequestEntity(BusinessProfileRequest businessProfileRequest) {
-    return _businessProfileRequestRepository.saveAndUpdate(_businessProfileRequestMapper.dtoToEntity(businessProfileRequest));
+  public BusinessProfileRequestEntity updateBusinessProfileRequestEntity(BusinessProfileUpdateRequest businessProfileUpdateRequest) {
+    return businessProfileRequestRepository.saveAndUpdate(businessProfileRequestMapper.dtoToEntity(businessProfileUpdateRequest));
   }
 
 }

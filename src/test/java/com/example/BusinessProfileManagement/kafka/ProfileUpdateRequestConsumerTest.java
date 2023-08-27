@@ -2,7 +2,7 @@ package com.example.BusinessProfileManagement.kafka;
 
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
 import com.example.BusinessProfileManagement.service.requestState.BusinessProfileRequestContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ public class ProfileUpdateRequestConsumerTest {
 
   @Test
   public void testConsumeProfileUpdateRequest() {
-    BusinessProfileRequest request = ProfileRequestHelper.createBusinessProfileRequest(
+    BusinessProfileUpdateRequest request = ProfileRequestHelper.createBusinessProfileRequest(
         ProfileHelper.createBusinessProfile("1234"), RequestType.CREATE
     );
     request.setRequestId("testRequestId");

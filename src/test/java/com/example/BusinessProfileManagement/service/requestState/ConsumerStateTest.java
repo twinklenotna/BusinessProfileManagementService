@@ -7,9 +7,8 @@ import com.example.BusinessProfileManagement.exception.BusinessProfileValidation
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.ProfileSubscription;
-import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
 import com.example.BusinessProfileManagement.service.BusinessProfileService;
 import com.example.BusinessProfileManagement.service.ProfileRequestService;
@@ -55,7 +54,7 @@ public class ConsumerStateTest {
             new InProgressState(_profileValidationService));
 
     BusinessProfile businessProfile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-    BusinessProfileRequest request =
+    BusinessProfileUpdateRequest request =
         ProfileRequestHelper.createBusinessProfileRequest(businessProfile, RequestType.SUBSCRIBE);
     ProfileSubscription profileSubscription = new ProfileSubscription(PROFILE_ID, request.getSubscriptions());
 
@@ -79,7 +78,7 @@ public class ConsumerStateTest {
             new InProgressState(_profileValidationService));
 
     BusinessProfile businessProfile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-    BusinessProfileRequest request =
+    BusinessProfileUpdateRequest request =
         ProfileRequestHelper.createBusinessProfileRequest(businessProfile, RequestType.SUBSCRIBE);
 
     when(_profileValidationService.validateRequest(request)).thenReturn(false);
@@ -101,7 +100,7 @@ public class ConsumerStateTest {
             new InProgressState(_profileValidationService));
 
     BusinessProfile businessProfile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-    BusinessProfileRequest request =
+    BusinessProfileUpdateRequest request =
         ProfileRequestHelper.createBusinessProfileRequest(businessProfile, RequestType.SUBSCRIBE);
 
     when(_profileValidationService.validateRequest(request)).thenThrow(new BusinessProfileValidationException("validation failed"));

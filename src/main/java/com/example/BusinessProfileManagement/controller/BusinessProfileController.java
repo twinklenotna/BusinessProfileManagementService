@@ -3,12 +3,14 @@ package com.example.BusinessProfileManagement.controller;
 import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundException;
 import com.example.BusinessProfileManagement.exception.BusinessProfileRequestNotFoundException;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
 import com.example.BusinessProfileManagement.service.BusinessProfileService;
 import com.example.BusinessProfileManagement.service.ProfileRequestService;
 import java.net.URI;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,14 +23,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/profiles")
+@RequestMapping("/profile")
+@RequiredArgsConstructor
 public class BusinessProfileController {
   private final BusinessProfileService profileService;
   private final ProfileRequestService profileRequestService;
 
-  public BusinessProfileController(BusinessProfileService profileService, ProfileRequestService profileRequestService) {
-    this.profileService = profileService;
-    this.profileRequestService = profileRequestService;
+
+  @PostMapping
+  public ResponseEntity<String> createProfile(@RequestBody BusinessProfile profile) {
+    String profileId = profileService.createProfileRequest(profile);
+    return ResponseEntity.created(URI.create("/profiles/" + profileId))
+            .body(profileId);
   }
 
   @PutMapping("/{profileId}")
@@ -38,12 +44,6 @@ public class BusinessProfileController {
     return ResponseEntity.accepted().body(requestId);
   }
 
-  @PostMapping
-  public ResponseEntity<String> createProfile(@RequestBody BusinessProfile profile) {
-    String profileId = profileService.createProfileRequest(profile);
-    return ResponseEntity.created(URI.create("/profiles/" + profileId))
-        .body(profileId);
-  }
 
   @GetMapping("/{profileId}")
   public ResponseEntity<BusinessProfile> getProfile(@PathVariable String profileId) {
@@ -66,15 +66,15 @@ public class BusinessProfileController {
   }
 
   @GetMapping("/{profileId}/requests")
-  public ResponseEntity<List<BusinessProfileRequest>> getProfileRequest(@PathVariable String profileId) {
-    List<BusinessProfileRequest> requests = profileRequestService.getProfileRequestByProfileId(profileId);
+  public ResponseEntity<List<BusinessProfileUpdateRequest>> getProfileUpdateRequests(@PathVariable String profileId) {
+    List<BusinessProfileUpdateRequest> requests = profileRequestService.getProfileUpdateRequestsByProfileId(profileId);
     return ResponseEntity.ok(requests);
   }
 
   @GetMapping("/{profileId}/requests/{requestId}")
-  public ResponseEntity<BusinessProfileRequestResponse> getProfileRequest(@PathVariable String profileId, @PathVariable String requestId) {
+  public ResponseEntity<BusinessProfileRequestResponse> getProfileUpdateRequests(@PathVariable String profileId, @PathVariable String requestId) {
     try{
-      BusinessProfileRequestResponse request = profileRequestService.getProfileRequest(requestId);
+      BusinessProfileRequestResponse request = profileRequestService.getProfileUpdateRequest(requestId);
       return ResponseEntity.ok(request);
     } catch(BusinessProfileRequestNotFoundException ex) {
       return ResponseEntity.notFound().build();

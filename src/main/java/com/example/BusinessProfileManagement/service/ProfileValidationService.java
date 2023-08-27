@@ -3,7 +3,7 @@ package com.example.BusinessProfileManagement.service;
 import com.example.BusinessProfileManagement.exception.BusinessProfileValidationException;
 import com.example.BusinessProfileManagement.factory.ProductValidationFactory;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestProductValidationRepository;
@@ -15,36 +15,26 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ProfileValidationService {
   Logger logger = LoggerFactory.getLogger(ProfileValidationService.class);
   final BusinessProfileRequestProductValidationRepository _businessProfileRequestProductValidationRepository;
-  final ProductValidationFactory _productValidationFactory;
-  final BusinessProfileService _businessProfileService;
-  final ProfileSubscriptionService _profileSubscriptionService;
-  final ProfileRequestService _profileRequestService;
-  final ProfileProductValidationService _profileProductValidationService;
+  private final ProductValidationFactory productValidationFactory;
+  private final BusinessProfileService _businessProfileService;
+  private final ProfileSubscriptionService _profileSubscriptionService;
+  private final ProfileRequestService profileRequestService;
+  private final ProfileProductValidationService profileProductValidationService;
 
-
-  public ProfileValidationService(
-      BusinessProfileRequestProductValidationRepository businessProfileRequestProductValidationRepository,
-      ProductValidationFactory productValidationFactory, BusinessProfileService businessProfileService,
-      ProfileSubscriptionService profileSubscriptionService, ProfileRequestService profileRequestService,
-      ProfileProductValidationService profileProductValidationService) {
-    _businessProfileRequestProductValidationRepository = businessProfileRequestProductValidationRepository;
-    _productValidationFactory = productValidationFactory;
-    _businessProfileService = businessProfileService;
-    _profileSubscriptionService = profileSubscriptionService;
-    _profileRequestService = profileRequestService;
-    _profileProductValidationService = profileProductValidationService;
-  }
 
   @Transactional
-  public boolean validateRequest(BusinessProfileRequest request) {
+  public boolean validateRequest(BusinessProfileUpdateRequest request) {
     logger.debug("Started Validation for requestId: "+ request);
     enrichRequest(request);
     Set<String> subscriptions = request.getSubscriptions();
@@ -90,7 +80,7 @@ public class ProfileValidationService {
 
   public Set<String> getSuccessfulProductValidations(String requestId) {
     List<BusinessProfileRequestProductValidation> allProductValidations =
-        _profileProductValidationService.getRequestProductValidations(requestId);
+        profileProductValidationService.getRequestProductValidations(requestId);
     return allProductValidations.stream()
         .filter(validateRequest -> !validateRequest.getStatus().equals(ApprovalStatus.FAILED))
         .map(validateRequest -> validateRequest.getProductId())
@@ -98,7 +88,7 @@ public class ProfileValidationService {
         Collectors.toSet());
   }
 
-  private void enrichRequest(BusinessProfileRequest request) {
+  private void enrichRequest(BusinessProfileUpdateRequest request) {
     BusinessProfile businessProfile = fetchBusinessProfileEntity(request.getProfileId(), request.getBusinessProfile());
     request.setBusinessProfile(businessProfile);
     fetchSubscriptions(request);
@@ -106,10 +96,10 @@ public class ProfileValidationService {
 
   public CompletableFuture<BusinessProfileRequestProductValidation> validateRequest(String productId, BusinessProfile profile, String requestId) {
     return CompletableFuture.supplyAsync(() -> {
-      BusinessProfileRequestProductValidation validation = _productValidationFactory
+      BusinessProfileRequestProductValidation validation = productValidationFactory
           .validateProfile(productId, profile);
       validation.setRequestId(requestId);
-      _profileProductValidationService.saveBusinessProfileRequestProductValidation(validation);
+      profileProductValidationService.saveBusinessProfileRequestProductValidation(validation);
       return validation;
     });
   }
@@ -122,7 +112,7 @@ public class ProfileValidationService {
     return businessProfile;
   }
 
-  public void fetchSubscriptions(BusinessProfileRequest request) {
+  public void fetchSubscriptions(BusinessProfileUpdateRequest request) {
     if(request.getSubscriptions().size() == 0) {
       request.setSubscriptions(_profileSubscriptionService.getSubscriptions(request.getProfileId()));
     }

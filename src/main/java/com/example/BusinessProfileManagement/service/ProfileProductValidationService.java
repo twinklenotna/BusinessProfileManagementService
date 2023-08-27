@@ -6,23 +6,21 @@ import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequest
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestProductValidationRepository;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ProfileProductValidationService {
   Logger logger = LoggerFactory.getLogger(ProfileProductValidationService.class);
-  final BusinessProfileRequestProductValidationRepository _businessProfileRequestProductValidationRepository;
-
-  public ProfileProductValidationService(
-      BusinessProfileRequestProductValidationRepository businessProfileRequestProductValidationRepository) {
-    this._businessProfileRequestProductValidationRepository = businessProfileRequestProductValidationRepository;
-  }
+  private final BusinessProfileRequestProductValidationRepository businessProfileRequestProductValidationRepository;
 
   public List<BusinessProfileRequestProductValidation> getRequestProductValidations(String requestId) {
     List<BusinessProfileRequestProductValidationEntity> profileRequestProductValidations =
-        _businessProfileRequestProductValidationRepository.findByRequestId(requestId);
+        businessProfileRequestProductValidationRepository.findByRequestId(requestId);
     List<BusinessProfileRequestProductValidation> validations = new ArrayList<>();
     for(BusinessProfileRequestProductValidationEntity productValidation : profileRequestProductValidations) {
       validations.add(BusinessProfileRequestProductValidationMapper.INSTANCE.entityToDto(productValidation));
@@ -32,7 +30,7 @@ public class ProfileProductValidationService {
 
   public BusinessProfileRequestProductValidation saveBusinessProfileRequestProductValidation(
       BusinessProfileRequestProductValidation validation) {
-    _businessProfileRequestProductValidationRepository.saveAndFlush(BusinessProfileRequestProductValidationMapper.INSTANCE.dtoToEntity(
+    businessProfileRequestProductValidationRepository.saveAndFlush(BusinessProfileRequestProductValidationMapper.INSTANCE.dtoToEntity(
         validation));
     return validation;
   }

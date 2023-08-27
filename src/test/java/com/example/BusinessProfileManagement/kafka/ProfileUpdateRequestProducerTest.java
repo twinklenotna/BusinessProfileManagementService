@@ -1,6 +1,6 @@
 package com.example.BusinessProfileManagement.kafka;
 
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class ProfileUpdateRequestProducerTest {
 
   @Mock
-  private KafkaTemplate<String, BusinessProfileRequest> kafkaTemplate;
+  private KafkaTemplate<String, BusinessProfileUpdateRequest> kafkaTemplate;
 
   @InjectMocks
   private ProfileUpdateRequestProducer profileUpdateRequestProducer;
@@ -31,13 +31,13 @@ public class ProfileUpdateRequestProducerTest {
 
   @Test
   public void testSendProfileUpdateRequestWithKey() throws ExecutionException, InterruptedException {
-    BusinessProfileRequest request = new BusinessProfileRequest();
+    BusinessProfileUpdateRequest request = new BusinessProfileUpdateRequest();
     request.setRequestId("testRequestId");
     request.setProfileId("testProfileId");
     String key = "testKey";
 
-    SendResult<String, BusinessProfileRequest> sendResult = new SendResult<>(null, null);
-    CompletableFuture<SendResult<String, BusinessProfileRequest>> future = CompletableFuture.completedFuture(sendResult);
+    SendResult<String, BusinessProfileUpdateRequest> sendResult = new SendResult<>(null, null);
+    CompletableFuture<SendResult<String, BusinessProfileUpdateRequest>> future = CompletableFuture.completedFuture(sendResult);
 
     when(kafkaTemplate.send(any(), any(), any())).thenReturn(future);
 

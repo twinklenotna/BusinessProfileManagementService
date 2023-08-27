@@ -5,9 +5,8 @@ import com.example.BusinessProfileManagement.factory.ProductValidationFactory;
 import com.example.BusinessProfileManagement.helper.ProductValidationHelper;
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
-import com.example.BusinessProfileManagement.kafka.ProfileUpdateRequestProducer;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequestEntity;
@@ -20,12 +19,9 @@ import java.util.HashSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -63,20 +59,20 @@ public class ProfileValidationServiceTest {
   public void testApproveRequest_AllProductsApproved() {
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
     BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
-    BusinessProfileRequest businessProfileRequest =
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.CREATE);
     BusinessProfileRequestEntity businessProfileRequestEntity =
         ProfileRequestHelper.createBusinessProfileRequestEntity(profileEntity, RequestType.CREATE, ApprovalStatus.APPROVED);
-    businessProfileRequestEntity.setRequestId(businessProfileRequest.getRequestId());
+    businessProfileRequestEntity.setRequestId(businessProfileUpdateRequest.getRequestId());
     BusinessProfileRequestProductValidation businessProfileRequestProductValidation =
         ProductValidationHelper
-            .createProfileRequestProductValidation(businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED);
+            .createProfileRequestProductValidation(businessProfileUpdateRequest.getRequestId(), ApprovalStatus.APPROVED);
     BusinessProfileRequestProductValidationEntity businessProfileRequestProductValidationEntity =
         ProductValidationHelper
-            .createProfileRequestProductValidationEntity(businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED);
+            .createProfileRequestProductValidationEntity(businessProfileUpdateRequest.getRequestId(), ApprovalStatus.APPROVED);
     List<BusinessProfileRequestProductValidation> businessProfileRequestProductValidations =
         ProductValidationHelper
-            .createProfileRequestProductValidations(3, businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED);
+            .createProfileRequestProductValidations(3, businessProfileUpdateRequest.getRequestId(), ApprovalStatus.APPROVED);
 
 
     when(businessProfileService.getProfileById(any())).thenReturn(profile);
@@ -85,13 +81,13 @@ public class ProfileValidationServiceTest {
     when(productValidationFactory.validateProfile(any(), any())).thenReturn(businessProfileRequestProductValidation);
     when(businessProfileRequestProductValidationRepository.saveAndFlush(any())).thenReturn(businessProfileRequestProductValidationEntity);
     when(profileRequestService.updateBusinessProfileRequestEntity(any())).thenReturn(businessProfileRequestEntity);
-    when(_profileProductValidationService.getRequestProductValidations(businessProfileRequest.getRequestId()))
+    when(_profileProductValidationService.getRequestProductValidations(businessProfileUpdateRequest.getRequestId()))
         .thenReturn(businessProfileRequestProductValidations);
     when(_profileProductValidationService.saveBusinessProfileRequestProductValidation(any()))
         .thenReturn(businessProfileRequestProductValidations.get(0));
 
 
-    boolean requestValidated = profileValidationService.validateRequest(businessProfileRequest);
+    boolean requestValidated = profileValidationService.validateRequest(businessProfileUpdateRequest);
 
     assertTrue(requestValidated);
 
@@ -101,17 +97,17 @@ public class ProfileValidationServiceTest {
   public void testApproveRequest_SomeProductsRejected() {
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
     BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
-    BusinessProfileRequest businessProfileRequest =
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.CREATE);
     BusinessProfileRequestEntity businessProfileRequestEntity =
         ProfileRequestHelper.createBusinessProfileRequestEntity(profileEntity, RequestType.CREATE, ApprovalStatus.APPROVED);
-    businessProfileRequestEntity.setRequestId(businessProfileRequest.getRequestId());
+    businessProfileRequestEntity.setRequestId(businessProfileUpdateRequest.getRequestId());
     BusinessProfileRequestProductValidation businessProfileRequestProductValidation =
         ProductValidationHelper
-            .createProfileRequestProductValidation(businessProfileRequest.getRequestId(), ApprovalStatus.REJECTED);
+            .createProfileRequestProductValidation(businessProfileUpdateRequest.getRequestId(), ApprovalStatus.REJECTED);
     BusinessProfileRequestProductValidationEntity businessProfileRequestProductValidationEntity =
         ProductValidationHelper
-            .createProfileRequestProductValidationEntity(businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED);
+            .createProfileRequestProductValidationEntity(businessProfileUpdateRequest.getRequestId(), ApprovalStatus.APPROVED);
 
     when(businessProfileService.getProfileById(any())).thenReturn(profile);
     when(profileSubscriptionService.getSubscriptions(any())).thenReturn(new HashSet<>(
@@ -119,13 +115,13 @@ public class ProfileValidationServiceTest {
     when(productValidationFactory.validateProfile(any(), any())).thenReturn(businessProfileRequestProductValidation);
     when(businessProfileRequestProductValidationRepository.saveAndFlush(any())).thenReturn(businessProfileRequestProductValidationEntity);
     when(profileRequestService.updateBusinessProfileRequestEntity(any())).thenReturn(businessProfileRequestEntity);
-    when(_profileProductValidationService.getRequestProductValidations(businessProfileRequest.getRequestId()))
-        .thenReturn(ProductValidationHelper.createProfileRequestProductValidations(3, businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED));
+    when(_profileProductValidationService.getRequestProductValidations(businessProfileUpdateRequest.getRequestId()))
+        .thenReturn(ProductValidationHelper.createProfileRequestProductValidations(3, businessProfileUpdateRequest.getRequestId(), ApprovalStatus.APPROVED));
     when(_profileProductValidationService.saveBusinessProfileRequestProductValidation(any()))
         .thenReturn(businessProfileRequestProductValidation);
 
 
-    boolean requestValidated = profileValidationService.validateRequest(businessProfileRequest);
+    boolean requestValidated = profileValidationService.validateRequest(businessProfileUpdateRequest);
 
     assertEquals(requestValidated, false);
   }
@@ -135,17 +131,17 @@ public class ProfileValidationServiceTest {
 
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
     BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
-    BusinessProfileRequest businessProfileRequest =
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.CREATE);
     BusinessProfileRequestEntity businessProfileRequestEntity =
         ProfileRequestHelper.createBusinessProfileRequestEntity(profileEntity, RequestType.CREATE, ApprovalStatus.APPROVED);
-    businessProfileRequestEntity.setRequestId(businessProfileRequest.getRequestId());
+    businessProfileRequestEntity.setRequestId(businessProfileUpdateRequest.getRequestId());
     BusinessProfileRequestProductValidation businessProfileRequestProductValidation =
         ProductValidationHelper
-            .createProfileRequestProductValidation(businessProfileRequest.getRequestId(), ApprovalStatus.FAILED);
+            .createProfileRequestProductValidation(businessProfileUpdateRequest.getRequestId(), ApprovalStatus.FAILED);
     BusinessProfileRequestProductValidationEntity businessProfileRequestProductValidationEntity =
         ProductValidationHelper
-            .createProfileRequestProductValidationEntity(businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED);
+            .createProfileRequestProductValidationEntity(businessProfileUpdateRequest.getRequestId(), ApprovalStatus.APPROVED);
 
     when(_profileProductValidationService.saveBusinessProfileRequestProductValidation(any()))
         .thenReturn(businessProfileRequestProductValidation);
@@ -155,12 +151,12 @@ public class ProfileValidationServiceTest {
     when(productValidationFactory.validateProfile(any(), any())).thenReturn(businessProfileRequestProductValidation);
     when(businessProfileRequestProductValidationRepository.saveAndFlush(any())).thenReturn(businessProfileRequestProductValidationEntity);
     when(profileRequestService.updateBusinessProfileRequestEntity(any())).thenReturn(businessProfileRequestEntity);
-    when(_profileProductValidationService.getRequestProductValidations(businessProfileRequest.getRequestId()))
-        .thenReturn(ProductValidationHelper.createProfileRequestProductValidations(3, businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED));
+    when(_profileProductValidationService.getRequestProductValidations(businessProfileUpdateRequest.getRequestId()))
+        .thenReturn(ProductValidationHelper.createProfileRequestProductValidations(3, businessProfileUpdateRequest.getRequestId(), ApprovalStatus.APPROVED));
 
 
     assertThrows(BusinessProfileValidationException.class, () -> {
-      profileValidationService.validateRequest(businessProfileRequest);
+      profileValidationService.validateRequest(businessProfileUpdateRequest);
     });
   }
 

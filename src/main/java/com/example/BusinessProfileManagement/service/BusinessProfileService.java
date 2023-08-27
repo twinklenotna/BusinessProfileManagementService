@@ -3,7 +3,7 @@ package com.example.BusinessProfileManagement.service;
 import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundException;
 import com.example.BusinessProfileManagement.kafka.ProfileUpdateRequestProducer;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
 import com.example.BusinessProfileManagement.model.enums.ProfileStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
@@ -12,31 +12,21 @@ import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequest
 import com.example.BusinessProfileManagement.repository.BusinessProfileRepository;
 import java.util.HashSet;
 import java.util.Set;
+
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class BusinessProfileService {
   Logger logger = LoggerFactory.getLogger(ProfileSubscriptionService.class);
-  final BusinessProfileRepository profileRepository;
-  final ProfileRequestService profileRequestService;
-  final ProfileUpdateRequestProducer profileUpdateRequestProducer;
-  final BusinessProfileMapper businessProfileMapper;
-  final BusinessProfileRequestMapper businessProfileRequestMapper;
-
-  @Autowired
-  public BusinessProfileService(BusinessProfileRepository profileRepository,
-      ProfileRequestService profileRequestService, ProfileUpdateRequestProducer profileUpdateRequestProducer,
-      BusinessProfileMapper businessProfileMapper, BusinessProfileRequestMapper businessProfileRequestMapper) {
-    this.profileRepository = profileRepository;
-    this.profileRequestService = profileRequestService;
-    this.profileUpdateRequestProducer = profileUpdateRequestProducer;
-    this.businessProfileMapper = businessProfileMapper;
-    this.businessProfileRequestMapper = businessProfileRequestMapper;
-  }
+  private final BusinessProfileRepository profileRepository;
+  private final ProfileRequestService profileRequestService;
+  private final ProfileUpdateRequestProducer profileUpdateRequestProducer;
+  private final BusinessProfileMapper businessProfileMapper;
 
   /**
    * To update the BusinessProfile
@@ -44,11 +34,11 @@ public class BusinessProfileService {
    */
   @Transactional
   public String updateProfile(BusinessProfile profile) {
-    BusinessProfileRequest businessProfileRequest =
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
         profileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>());
-    logger.info("created profile request with id: " + businessProfileRequest.getRequestId());
-    sendProfileUpdateRequest(businessProfileRequest);
-    return businessProfileRequest.getRequestId();
+    logger.info("created profile request with id: " + businessProfileUpdateRequest.getRequestId());
+    sendProfileUpdateRequest(businessProfileUpdateRequest);
+    return businessProfileUpdateRequest.getRequestId();
   }
 
   /**
@@ -58,10 +48,10 @@ public class BusinessProfileService {
    */
   @Transactional
   public String updateProfile(BusinessProfile profile, Set<String> subscriptions) {
-    BusinessProfileRequest businessProfileRequest =
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
         profileRequestService.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE, subscriptions);
-    sendProfileUpdateRequest(businessProfileRequest);
-    return businessProfileRequest.getRequestId();
+    sendProfileUpdateRequest(businessProfileUpdateRequest);
+    return businessProfileUpdateRequest.getRequestId();
   }
 
   /**
@@ -72,9 +62,9 @@ public class BusinessProfileService {
   @Transactional
   public String createProfileRequest(BusinessProfile profile) {
     BusinessProfileEntity businessProfileEntity = createBusinessProfileEntity(profile);
-    BusinessProfileRequest businessProfileRequest =
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
         profileRequestService.createBusinessProfileRequest(profile, RequestType.CREATE, new HashSet<>());
-    sendProfileUpdateRequest(businessProfileRequest);
+    sendProfileUpdateRequest(businessProfileUpdateRequest);
     return businessProfileEntity.getProfileId();
   }
 
@@ -102,7 +92,7 @@ public class BusinessProfileService {
       logger.warn("Business profile with id: " + profileId + " not found");
       throw new BusinessProfileNotFoundException("Business profile with id: " + profileId + " not found");
     }
-    return businessProfileMapper.entityToDto(profileEntity);
+    return businessProfileMapper.toDto(profileEntity);
   }
 
   /**
@@ -111,7 +101,7 @@ public class BusinessProfileService {
    * @return profile Entity
    */
   private BusinessProfileEntity createBusinessProfileEntity(BusinessProfile profile) {
-    BusinessProfileEntity profileEntity = businessProfileMapper.dtoToEntity(profile);
+    BusinessProfileEntity profileEntity = businessProfileMapper.toEntity(profile);
     profileEntity.setStatus(ProfileStatus.DRAFT);
     return profileRepository.save(profileEntity);
   }
@@ -122,7 +112,7 @@ public class BusinessProfileService {
    * @return profile Entity
    */
   public BusinessProfileEntity updateBusinessProfileEntity(BusinessProfile profile) {
-    BusinessProfileEntity profileEntity = businessProfileMapper.dtoToEntity(profile);
+    BusinessProfileEntity profileEntity = businessProfileMapper.toEntity(profile);
     profileEntity.setStatus(ProfileStatus.ACTIVE);
     return profileRepository.save(profileEntity);
   }
@@ -131,7 +121,7 @@ public class BusinessProfileService {
    * Send profile for async validations
    * @param request profile request Object
    */
-  public void sendProfileUpdateRequest(BusinessProfileRequest request) {
+  public void sendProfileUpdateRequest(BusinessProfileUpdateRequest request) {
     profileUpdateRequestProducer.sendProfileUpdateRequestWithKey(
         request.getProfileId(),
         request);

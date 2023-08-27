@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BusinessProfileRequest {
+public class BusinessProfileUpdateRequest {
   private String profileId;
   private String requestId;
   private ApprovalStatus status;

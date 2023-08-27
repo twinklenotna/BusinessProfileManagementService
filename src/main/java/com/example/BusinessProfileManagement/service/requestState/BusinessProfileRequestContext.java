@@ -1,6 +1,6 @@
 package com.example.BusinessProfileManagement.service.requestState;
 
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -25,22 +25,22 @@ public class BusinessProfileRequestContext {
   }
 
   @Transactional
-  public void processRequest(BusinessProfileRequest request) {
-    currentState = inProgressState;
+  public void processRequest(BusinessProfileUpdateRequest request) {
+      currentState = inProgressState;
     currentState.processRequest(request, this);
   }
 
-  public void transitionToApproved(BusinessProfileRequest request) {
+  public void transitionToApproved(BusinessProfileUpdateRequest request) {
     currentState = approvedState;
     currentState.processRequest(request, this);
   }
 
-  public void transitionToRejected(BusinessProfileRequest request) {
+  public void transitionToRejected(BusinessProfileUpdateRequest request) {
     currentState = rejectedState;
     currentState.processRequest(request, this);
   }
 
-  public void transitionToFailed(BusinessProfileRequest request) {
+  public void transitionToFailed(BusinessProfileUpdateRequest request) {
     currentState = failedState;
     currentState.processRequest(request, this);
   }

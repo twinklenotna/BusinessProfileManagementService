@@ -18,7 +18,7 @@ public class ProfileUpdateRequestConsumer {
 
   @KafkaListener(topics = "profileRequest", groupId = "profileRequestValidationGroup")
   public void consumeProfileUpdateRequest(BusinessProfileUpdateRequest request) {
-    logger.debug("Processing request with requestId: {}  and profileId: {} ", request.getRequestId(), request.getProfileId());
+    logger.info("Processing request with requestId: {}  and profileId: {} ", request.getRequestId(), request.getProfileId());
     _businessProfileRequestContext.processRequest(request);
   }
 }

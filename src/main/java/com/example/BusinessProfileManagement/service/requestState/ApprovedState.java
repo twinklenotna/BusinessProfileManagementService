@@ -30,9 +30,7 @@ public class ApprovedState implements ConsumerState {
     _profileRequestService.updateBusinessProfileRequestEntity(request);
     _businessProfileService.updateBusinessProfileEntity(request.getBusinessProfile());
     if(request.getRequestType().equals(RequestType.SUBSCRIBE)) {
-      ProfileSubscription profileSubscription =
-          new ProfileSubscription(request.getProfileId(), request.getSubscriptions());
-      _profileSubscriptionService.subscribe(profileSubscription);
+      _profileSubscriptionService.addSubscriptions(request.getProfileId(), request.getSubscriptions());
     }
   }
 }

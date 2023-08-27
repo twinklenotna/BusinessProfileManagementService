@@ -37,8 +37,10 @@ public class ProfileSubscriptionService {
   public void addSubscriptions(String profileId, Set<String> subscriptions) {
     ProfileSubscriptionEntity profileSubscriptionEntity = new ProfileSubscriptionEntity(profileId, new HashSet<>());
     try{
-      profileSubscriptionEntity = profileSubscriptionRepository.getProfileById(profileId);
-      profileSubscriptionEntity.getSubscriptions().addAll(subscriptions);
+      ProfileSubscriptionEntity profileSubscriptions= profileSubscriptionRepository.getProfileById(profileId);
+      if(profileSubscriptions != null) {
+        profileSubscriptionEntity.getSubscriptions().addAll(subscriptions);
+      }
     } catch(NullPointerException ex) {
       logger.warn("No subscriptions found for profileId: "+ profileId);
     } finally {

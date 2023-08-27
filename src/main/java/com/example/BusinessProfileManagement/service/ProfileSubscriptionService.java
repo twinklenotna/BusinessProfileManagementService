@@ -42,7 +42,6 @@ public class ProfileSubscriptionService {
     try{
       profileSubscriptionEntity = _profileSubscriptionRepository.getProfileById(profileId);
       profileSubscriptionEntity.getSubscriptions().addAll(subscriptions);
-
     } catch(NullPointerException ex) {
       logger.warn("No subscriptions found for profileId: "+ profileId);
     } finally {

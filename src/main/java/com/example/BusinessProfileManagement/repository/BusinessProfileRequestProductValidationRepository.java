@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class BusinessProfileRequestProductValidationRepository  {
-  // Save a BusinessProfileRequestProductValidationEntity
   DynamoDBMapper dynamoDBMapper;
 
   BusinessProfileRequestProductValidationRepository(DynamoDBMapper dynamoDBMapper) {
@@ -26,9 +25,8 @@ public class BusinessProfileRequestProductValidationRepository  {
     return entity;
   }
 
-  // Find all validation entries by requestId
   public List<BusinessProfileRequestProductValidationEntity> findByRequestId(String requestId) {
-    String partitionKey = "requestId"; // Specify the partition key value
+    String partitionKey = "requestId";
 
     Map<String, AttributeValue> eav = new HashMap<>();
     eav.put(":val1", new AttributeValue().withS(partitionKey));
@@ -43,9 +41,4 @@ public class BusinessProfileRequestProductValidationRepository  {
 
     return results;
   }
-
 }
-
-// alternatives consideration -- why this choice
-
-//scalability, microservices, react, springboot, multithreading

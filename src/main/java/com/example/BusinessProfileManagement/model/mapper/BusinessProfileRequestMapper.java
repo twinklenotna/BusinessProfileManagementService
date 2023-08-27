@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 
-@Mapper(componentModel = "spring", uses = BusinessProfilePatchMapper.class)
+@Mapper(componentModel = "spring", uses = BusinessProfileMapper.class)
 public interface BusinessProfileRequestMapper {
   BusinessProfileRequest entityToDto(BusinessProfileRequestEntity entity);
 

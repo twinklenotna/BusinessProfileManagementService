@@ -10,8 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RejectedState implements ConsumerState {
-  @Autowired
-  ProfileRequestService _profileRequestService;
+  final ProfileRequestService _profileRequestService;
+
+  public RejectedState(ProfileRequestService _profileRequestService) {
+    this._profileRequestService = _profileRequestService;
+  }
+
   @Override
   public void processRequest(BusinessProfileRequest request,
       BusinessProfileRequestContext businessProfileRequestContext) {

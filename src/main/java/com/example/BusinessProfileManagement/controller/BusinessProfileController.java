@@ -4,6 +4,7 @@ import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundEx
 import com.example.BusinessProfileManagement.exception.BusinessProfileRequestNotFoundException;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
 import com.example.BusinessProfileManagement.service.BusinessProfileService;
 import com.example.BusinessProfileManagement.service.ProfileRequestService;
 import java.net.URI;
@@ -11,6 +12,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,17 +31,18 @@ public class BusinessProfileController {
     this.profileRequestService = profileRequestService;
   }
 
-  @PostMapping("/update")
-  public ResponseEntity<String> updateProfile(@RequestBody BusinessProfile profile) {
-    profileService.updateProfile(profile);
-    return ResponseEntity.accepted().body("Profile update request accepted.");
+  @PutMapping("/{profileId}")
+  public ResponseEntity<String> updateProfile(@PathVariable String profileId, @RequestBody BusinessProfile profile) {
+    profile.setProfileId(profileId);
+    String requestId = profileService.updateProfile(profile);
+    return ResponseEntity.accepted().body(requestId);
   }
 
   @PostMapping
   public ResponseEntity<String> createProfile(@RequestBody BusinessProfile profile) {
     String profileId = profileService.createProfileRequest(profile);
     return ResponseEntity.created(URI.create("/profiles/" + profileId))
-        .body("Profile creation request is accepted. Profile ID: " + profileId);
+        .body(profileId);
   }
 
   @GetMapping("/{profileId}")
@@ -53,11 +56,11 @@ public class BusinessProfileController {
   }
 
   @DeleteMapping("/{profileId}")
-  public ResponseEntity<String> deleteProfile(@PathVariable String profileId) {
-    try{
+  public ResponseEntity<Void> deleteProfile(@PathVariable String profileId) {
+    try {
       profileService.deleteProfile(profileId);
-      return ResponseEntity.ok("Profile deleted");
-    } catch(BusinessProfileNotFoundException ex) {
+      return ResponseEntity.noContent().build();
+    } catch (BusinessProfileNotFoundException ex) {
       return ResponseEntity.notFound().build();
     }
   }
@@ -69,9 +72,9 @@ public class BusinessProfileController {
   }
 
   @GetMapping("/{profileId}/requests/{requestId}")
-  public ResponseEntity<BusinessProfileRequest> getProfileRequest(@PathVariable String profileId, @PathVariable String requestId) {
+  public ResponseEntity<BusinessProfileRequestResponse> getProfileRequest(@PathVariable String profileId, @PathVariable String requestId) {
     try{
-      BusinessProfileRequest request = profileRequestService.getProfileRequest(requestId);
+      BusinessProfileRequestResponse request = profileRequestService.getProfileRequest(requestId);
       return ResponseEntity.ok(request);
     } catch(BusinessProfileRequestNotFoundException ex) {
       return ResponseEntity.notFound().build();

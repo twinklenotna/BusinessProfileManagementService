@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverted;
 import com.example.BusinessProfileManagement.model.convertor.ApprovalStatusConverter;
 import com.example.BusinessProfileManagement.model.convertor.ProductSetConverter;
-import com.example.BusinessProfileManagement.model.convertor.RequestTypeConvertor;
+import com.example.BusinessProfileManagement.model.convertor.RequestTypeConverter;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
 import java.util.Set;
@@ -28,14 +28,14 @@ public class BusinessProfileRequestEntity {
   private String profileId;
 
   @DynamoDBAttribute
-  private BusinessProfilePatchRequestEntity businessProfile;
+  private BusinessProfileEntity businessProfile;
 
   @DynamoDBAttribute
   @DynamoDBTypeConverted(converter = ApprovalStatusConverter.class)
   private ApprovalStatus status;
 
   @DynamoDBAttribute
-  @DynamoDBTypeConverted(converter = RequestTypeConvertor.class)
+  @DynamoDBTypeConverted(converter = RequestTypeConverter.class)
   private RequestType requestType;
 
   @DynamoDBAttribute

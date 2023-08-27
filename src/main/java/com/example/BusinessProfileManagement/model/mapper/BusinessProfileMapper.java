@@ -12,8 +12,6 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring", uses = AddressMapper.class)
 public interface BusinessProfileMapper {
-//  BusinessProfileMapper INSTANCE = Mappers.getMapper(BusinessProfileMapper.class);
-
   @Mappings({
       @Mapping(source = "taxInfoEntity", target = "taxInfo"),
   })

@@ -15,14 +15,13 @@ public class ProfileUpdateRequestConsumer {
   Logger logger = LoggerFactory.getLogger(ProfileUpdateRequestConsumer.class);
   final BusinessProfileRequestContext _businessProfileRequestContext;
 
-  public ProfileUpdateRequestConsumer(ProfileValidationService profileValidationService,
-      BusinessProfileRequestContext _businessProfileRequestContext) {
+  public ProfileUpdateRequestConsumer(BusinessProfileRequestContext _businessProfileRequestContext) {
     this._businessProfileRequestContext = _businessProfileRequestContext;
   }
 
   @KafkaListener(topics = "profileRequest", groupId = "profileRequestValidationGroup")
   public void consumeProfileUpdateRequest(BusinessProfileRequest request) {
-    logger.debug("Processing request with requestId: {}  and profileId: {} ",request.getRequestId(),request.getProfileId());
+    logger.debug("Processing request with requestId: {}  and profileId: {} ", request.getRequestId(), request.getProfileId());
     _businessProfileRequestContext.processRequest(request);
   }
 }

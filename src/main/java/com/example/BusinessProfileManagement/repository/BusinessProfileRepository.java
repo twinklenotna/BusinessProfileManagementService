@@ -26,9 +26,8 @@ public class BusinessProfileRepository {
     return dynamoDBMapper.load(BusinessProfileEntity.class, profileId);
   }
 
-  public String delete(String profileId) {
+  public void delete(String profileId) {
     BusinessProfileEntity emp = dynamoDBMapper.load(BusinessProfileEntity.class, profileId);
     dynamoDBMapper.delete(emp);
-    return "Employee Deleted!";
   }
 }

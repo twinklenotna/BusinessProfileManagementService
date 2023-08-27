@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverted;
 import com.example.BusinessProfileManagement.model.TaxInfo;
-import com.example.BusinessProfileManagement.model.convertor.ProfileStatusConvertor;
+import com.example.BusinessProfileManagement.model.convertor.ProfileStatusConverter;
 import com.example.BusinessProfileManagement.model.convertor.TaxInfoEncryptConverter;
 import com.example.BusinessProfileManagement.model.enums.ProfileStatus;
 import lombok.AllArgsConstructor;
@@ -40,7 +40,7 @@ public class BusinessProfileEntity {
   @DynamoDBAttribute
   private Long creationTime;
   @DynamoDBAttribute
-  @DynamoDBTypeConverted(converter = ProfileStatusConvertor.class)
+  @DynamoDBTypeConverted(converter = ProfileStatusConverter.class)
   private ProfileStatus status;
 
 }

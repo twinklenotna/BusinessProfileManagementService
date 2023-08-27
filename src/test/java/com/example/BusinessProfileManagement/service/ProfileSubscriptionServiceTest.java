@@ -1,5 +1,6 @@
 package com.example.BusinessProfileManagement.service;
 
+import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundException;
 import com.example.BusinessProfileManagement.helper.SubscriptionHelper;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.ProfileSubscription;
@@ -61,6 +62,18 @@ public class ProfileSubscriptionServiceTest {
   }
 
   @Test
+  public void testGetSubscriptionsException() {
+    String profileId = "123";
+    when(profileSubscriptionRepository.getProfileById(profileId))
+        .thenThrow(new NullPointerException());
+
+    Set<String> subscriptions = profileSubscriptionService.getSubscriptions(profileId);
+
+    assertNotNull(subscriptions);
+    assertEquals(subscriptions.size(), 0);
+  }
+
+  @Test
   public void testAddSubscriptions() {
     String profileId = "123";
     Set<String> subscriptions = new HashSet<>(Arrays.asList("product1", "product2"));
@@ -74,6 +87,23 @@ public class ProfileSubscriptionServiceTest {
 
     Set<String> updatedSubscriptions = profileSubscriptionEntity.getSubscriptions();
     assertTrue(updatedSubscriptions.containsAll(subscriptions));
+  }
+
+  @Test
+  public void testAddSubscriptionsException() {
+
+    String profileId = "123";
+    Set<String> subscriptions = new HashSet<>(Arrays.asList("product1", "product2"));
+    ProfileSubscriptionEntity profileSubscriptionEntity = new ProfileSubscriptionEntity();
+    profileSubscriptionEntity.setSubscriptions(new HashSet<>(Arrays.asList("existingProduct")));
+
+    when(profileSubscriptionRepository.getProfileById(profileId)).thenThrow(new NullPointerException());
+    when(profileSubscriptionRepository.save(any())).thenReturn(profileSubscriptionEntity);
+
+    profileSubscriptionService.addSubscriptions(profileId, subscriptions);
+
+    verify(profileSubscriptionRepository, times(1)).save(any());
+    verify(profileSubscriptionRepository, times(1)).getProfileById(any());
   }
 
 }

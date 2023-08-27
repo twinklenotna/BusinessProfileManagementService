@@ -30,7 +30,7 @@ public class SubscriptionController {
   }
 
   @GetMapping("/{profileId}")
-  public ResponseEntity<Set<String>> subscribe(@PathVariable String profileId) {
+  public ResponseEntity<Set<String>> getSubscriptions(@PathVariable String profileId) {
     Set<String> subscriptions = _profileSubscriptionService.getSubscriptions(profileId);
     return ResponseEntity.ok(subscriptions);
   }

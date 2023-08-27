@@ -18,6 +18,10 @@ public class TaxInfoEncryptConverter implements DynamoDBTypeConverter<String, Ta
     secretKey = keyGenerator.generateKey();
   }
 
+  public TaxInfoEncryptConverter(SecretKey secretKey) {
+    this.secretKey = secretKey;
+  }
+
   @Override
   public String convert(TaxInfo taxInfo) {
     try {

@@ -1,5 +1,7 @@
 package com.example.BusinessProfileManagement.service;
 
+import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundException;
+import com.example.BusinessProfileManagement.exception.BusinessProfileValidationException;
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.kafka.ProfileUpdateRequestProducer;
@@ -11,12 +13,15 @@ import com.example.BusinessProfileManagement.model.mapper.BusinessProfileMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRepository;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestRepository;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -32,16 +37,10 @@ public class BusinessProfileServiceTest {
   private BusinessProfileRepository profileRepository;
 
   @Mock
-  private BusinessProfileRequestRepository businessProfileRequestRepository;
-
-  @Mock
   private ProfileRequestService profileRequestService;
 
   @Mock
   private ProfileUpdateRequestProducer profileUpdateRequestProducer;
-
-  @Mock
-  private BusinessProfileRequestMapper businessProfileRequestMapper;
 
   @BeforeEach
   public void setUp() {
@@ -64,26 +63,52 @@ public class BusinessProfileServiceTest {
     verify(profileUpdateRequestProducer, times(1)).sendProfileUpdateRequestWithKey(any(), any());
   }
 
-//  @Test
+  @Test
+  public void testUpdateProfileEntity() {
+    BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
+    BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
+
+    when(profileRepository.save(any())).thenReturn(profileEntity);
+    when(businessProfileMapper.dtoToEntity(profile)).thenReturn(profileEntity);
+
+    businessProfileService.updateBusinessProfileEntity(profile);
+
+    verify(profileRepository, times(1)).save(any());
+  }
+
+  @Test
+  public void testUpdateProfileWithSubscriptions() {
+    BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
+    BusinessProfileRequest businessProfileRequest = ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE);
+
+    when(profileRequestService.createBusinessProfileRequest(eq(profile), eq(RequestType.SUBSCRIBE), any()))
+        .thenReturn(businessProfileRequest);
+
+    businessProfileService.updateProfile(profile, businessProfileRequest.getSubscriptions());
+
+    verify(profileRequestService, times(1)).createBusinessProfileRequest(eq(profile), eq(RequestType.SUBSCRIBE), any());
+    verify(profileUpdateRequestProducer, times(1)).sendProfileUpdateRequestWithKey(any(), any());
+  }
+
+  @Test
   public void testCreateProfileRequest() {
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
+    BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
     BusinessProfileRequest businessProfileRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.CREATE);
-    BusinessProfileEntity businessProfileEntity = businessProfileMapper.dtoToEntity(profile);
 
-    when(profileRepository.save(any())).thenReturn(businessProfileEntity);
+    when(profileRepository.save(any())).thenReturn(profileEntity);
     when(profileRequestService.createBusinessProfileRequest(profile, RequestType.CREATE, new HashSet<>()))
         .thenReturn(businessProfileRequest);
+    when(businessProfileMapper.dtoToEntity(profile)).thenReturn(profileEntity);
 
     String profileId = businessProfileService.createProfileRequest(profile);
 
     assertNotNull(profileId);
   }
 
-//  @Test
+  @Test
   public void testDeleteProfile() {
-    BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-
     doNothing().when(profileRepository).delete(PROFILE_ID);
 
     businessProfileService.deleteProfile(PROFILE_ID);
@@ -91,19 +116,38 @@ public class BusinessProfileServiceTest {
     verify(profileRepository, times(1)).delete(PROFILE_ID);
   }
 
-//  @Test
+  @Test
+  public void testDeleteProfileException() {
+    doThrow(new RuntimeException("profile not found")).when(profileRepository).delete(PROFILE_ID);
+
+    assertThrows(BusinessProfileNotFoundException.class, () -> {
+      businessProfileService.deleteProfile(PROFILE_ID);
+    });
+  }
+
+  @Test
   public void testGetProfileById() {
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-    BusinessProfileEntity businessProfileEntity = businessProfileMapper.dtoToEntity(profile);
+    BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
 
-    when(profileRepository.getProfileById(PROFILE_ID)).thenReturn(businessProfileEntity);
+    when(profileRepository.getProfileById(PROFILE_ID)).thenReturn(profileEntity);
+    when(businessProfileMapper.dtoToEntity(profile)).thenReturn(profileEntity);
+    when(businessProfileMapper.entityToDto(profileEntity)).thenReturn(profile);
 
     BusinessProfile profileResponse = businessProfileService.getProfileById(PROFILE_ID);
 
     verify(profileRepository, times(1)).getProfileById(PROFILE_ID);
 
     assertNotNull(profileResponse);
-    assertEquals(profileResponse, profile);
+    assertEquals(profileResponse.getProfileId(), profile.getProfileId());
+  }
+
+  @Test
+  public void testGetProfileByIdNotFound() {
+    when(profileRepository.getProfileById(PROFILE_ID)).thenReturn(null);
+    assertThrows(BusinessProfileNotFoundException.class, () -> {
+      businessProfileService.getProfileById(PROFILE_ID);
+    });
   }
 }
 

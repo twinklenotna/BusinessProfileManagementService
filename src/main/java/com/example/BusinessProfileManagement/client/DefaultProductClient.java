@@ -5,7 +5,6 @@ import com.example.BusinessProfileManagement.exception.BusinessProfileValidation
 import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
-import com.example.BusinessProfileManagement.service.ProfileRequestService;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

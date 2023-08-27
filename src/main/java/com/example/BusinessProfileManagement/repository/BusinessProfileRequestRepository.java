@@ -14,53 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-
-//@Repository
-//public class BusinessProfileRequestRepository {
-//  private final String requestId = "requestId";
-//  DynamoDBMapper dynamoDBMapper;
-//
-//  BusinessProfileRequestRepository(DynamoDBMapper dynamoDBMapper) {
-//    this.dynamoDBMapper = dynamoDBMapper;
-//  }
-//  public BusinessProfileRequestEntity save(BusinessProfileRequestEntity profileRequest) {
-//    dynamoDBMapper.save(profileRequest);
-//    return profileRequest;
-//  }
-//
-//  public BusinessProfileRequestEntity getProfileRequestsByProfileId(String profileId) {
-//    Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
-//    eav.put(":v1", new AttributeValue().withS(profileId));
-////    eav.put(":v2", new AttributeValue().withS(requestId));
-//
-//    DynamoDBQueryExpression<BusinessProfileRequestEntity> queryExpression = new DynamoDBQueryExpression<BusinessProfileRequestEntity>()
-//        .withKeyConditionExpression("profileId = :v1 and requestId= :v2")
-//        .withExpressionAttributeValues(eav);
-//    List<BusinessProfileRequestEntity> businessProfileRequestEntities = dynamoDBMapper.query(BusinessProfileRequestEntity.class,queryExpression);
-//    return businessProfileRequestEntities.get(0);
-//  }
-//
-//  public BusinessProfileRequestEntity getProfileRequest(String requestId) {
-//    return dynamoDBMapper.load(BusinessProfileRequestEntity.class, requestId);
-//  }
-//
-//  public String delete(String requestId) {
-//    BusinessProfileRequestEntity request = dynamoDBMapper.load(BusinessProfileRequestEntity.class, requestId);
-//    dynamoDBMapper.delete(request);
-//    return "Request Deleted!";
-//  }
-//
-//  public String update(String requestId, BusinessProfileRequestEntity request) {
-//    dynamoDBMapper.save(request,
-//        new DynamoDBSaveExpression()
-//            .withExpectedEntry(requestId,
-//                new ExpectedAttributeValue(
-//                    new AttributeValue().withS(requestId)
-//                )));
-//    return requestId;
-//  }
-//}
-
 @Repository
 public class BusinessProfileRequestRepository {
   final DynamoDBMapper _dynamoDBMapper;

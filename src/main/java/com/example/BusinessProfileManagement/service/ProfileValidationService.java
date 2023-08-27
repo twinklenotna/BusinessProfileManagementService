@@ -5,7 +5,6 @@ import com.example.BusinessProfileManagement.factory.ProductValidationFactory;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
-import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequestProductValidationEntity;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestProductValidationMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestProductValidationRepository;
@@ -29,17 +28,20 @@ public class ProfileValidationService {
   final BusinessProfileService _businessProfileService;
   final ProfileSubscriptionService _profileSubscriptionService;
   final ProfileRequestService _profileRequestService;
+  final ProfileProductValidationService _profileProductValidationService;
 
 
   public ProfileValidationService(
       BusinessProfileRequestProductValidationRepository businessProfileRequestProductValidationRepository,
       ProductValidationFactory productValidationFactory, BusinessProfileService businessProfileService,
-      ProfileSubscriptionService profileSubscriptionService, ProfileRequestService profileRequestService) {
+      ProfileSubscriptionService profileSubscriptionService, ProfileRequestService profileRequestService,
+      ProfileProductValidationService profileProductValidationService) {
     _businessProfileRequestProductValidationRepository = businessProfileRequestProductValidationRepository;
     _productValidationFactory = productValidationFactory;
     _businessProfileService = businessProfileService;
     _profileSubscriptionService = profileSubscriptionService;
     _profileRequestService = profileRequestService;
+    _profileProductValidationService = profileProductValidationService;
   }
 
   @Transactional
@@ -85,18 +87,11 @@ public class ProfileValidationService {
     return allApproved.get();
   }
 
-  public List<BusinessProfileRequestProductValidation> getRequestProductValidations(String requestId) {
-    List<BusinessProfileRequestProductValidationEntity> profileRequestProductValidations =
-        _businessProfileRequestProductValidationRepository.findByRequestId(requestId);
-    List<BusinessProfileRequestProductValidation> validations = new ArrayList<>();
-    for(BusinessProfileRequestProductValidationEntity productValidation : profileRequestProductValidations) {
-      validations.add(BusinessProfileRequestProductValidationMapper.INSTANCE.entityToDto(productValidation));
-    }
-    return validations;
-  }
+
 
   public Set<String> getSuccessfulProductValidations(String requestId) {
-    List<BusinessProfileRequestProductValidation> allProductValidations = getRequestProductValidations(requestId);
+    List<BusinessProfileRequestProductValidation> allProductValidations =
+        _profileProductValidationService.getRequestProductValidations(requestId);
     return allProductValidations.stream()
         .filter(validateRequest -> !validateRequest.getStatus().equals(ApprovalStatus.FAILED))
         .map(validateRequest -> validateRequest.getProductId())
@@ -115,10 +110,12 @@ public class ProfileValidationService {
       BusinessProfileRequestProductValidation validation = _productValidationFactory
           .validateProfile(productId, profile);
       validation.setRequestId(requestId);
-      _businessProfileRequestProductValidationRepository.saveAndFlush(BusinessProfileRequestProductValidationMapper.INSTANCE.dtoToEntity(validation));
-      return validation;
+      return _profileProductValidationService.getBusinessProfileRequestProductValidation(validation);
     });
   }
+
+
+
   public BusinessProfile fetchBusinessProfileEntity(String profileId, BusinessProfile businessProfilePatchRequest) {
     BusinessProfile businessProfile = _businessProfileService.getProfileById(profileId);
     businessProfile.applyPatch(businessProfilePatchRequest);

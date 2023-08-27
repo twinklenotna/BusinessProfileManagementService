@@ -45,7 +45,7 @@ public class ProfileRequestServiceTest {
   @Mock
   private ProfileSubscriptionService profileSubscriptionService;
 
-  @Mock ProfileValidationService _profileValidationService;
+  @Mock ProfileProductValidationService _profileProductValidationService;
   @Mock
   BusinessProfileRequestMapper _businessProfileRequestMapper;
   @Mock
@@ -84,7 +84,7 @@ public class ProfileRequestServiceTest {
     businessProfileRequestResponse.setRequestId(requestId);
 
     when(businessProfileRequestRepository.findByRequestId(requestId)).thenReturn(businessProfileRequestEntity);
-    when(_profileValidationService.getRequestProductValidations(requestId))
+    when(_profileProductValidationService.getRequestProductValidations(requestId))
         .thenReturn(ProductValidationHelper.createProfileRequestProductValidations(3, requestId, ApprovalStatus.APPROVED));
     when(_businessProfileRequestResponseMapper.entityToDto(businessProfileRequestEntity)).thenReturn(businessProfileRequestResponse);
 
@@ -97,7 +97,7 @@ public class ProfileRequestServiceTest {
   public void testGetProfileRequestException() {
     String requestId = "12345";
     when(businessProfileRequestRepository.findByRequestId(requestId)).thenReturn(null);
-    when(_profileValidationService.getRequestProductValidations(requestId))
+    when(_profileProductValidationService.getRequestProductValidations(requestId))
         .thenReturn(null);
     assertThrows(BusinessProfileRequestNotFoundException.class, () -> {
       profileRequestService.getProfileRequest(requestId);
@@ -130,7 +130,6 @@ public class ProfileRequestServiceTest {
     assertThrows(BusinessProfileRequestException.class, () -> {
       profileRequestService.updateRequestStatus(request, ApprovalStatus.APPROVED);
     });
-
   }
 
 

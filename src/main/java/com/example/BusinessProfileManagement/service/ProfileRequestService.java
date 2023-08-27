@@ -27,18 +27,18 @@ public class ProfileRequestService {
   final BusinessProfileRequestRepository _businessProfileRequestRepository;
   final BusinessProfileMapper businessProfileMapper;
   final BusinessProfileRequestMapper _businessProfileRequestMapper;
-  final ProfileValidationService _profileValidationService;
+  final ProfileProductValidationService _profileProductValidationService;
   final BusinessProfileRequestResponseMapper _businessProfileRequestResponseMapper;
 
   public ProfileRequestService(
       BusinessProfileRequestRepository businessProfileRequestRepository,
       BusinessProfileMapper businessProfileMapper, BusinessProfileRequestMapper businessProfileRequestMapper,
-      ProfileValidationService profileValidationService,
+      ProfileProductValidationService profileProductValidationService,
       BusinessProfileRequestResponseMapper businessProfileRequestResponseMapper) {
     _businessProfileRequestRepository = businessProfileRequestRepository;
     this.businessProfileMapper = businessProfileMapper;
     _businessProfileRequestMapper = businessProfileRequestMapper;
-    _profileValidationService = profileValidationService;
+    _profileProductValidationService = profileProductValidationService;
     _businessProfileRequestResponseMapper = businessProfileRequestResponseMapper;
   }
 
@@ -54,7 +54,7 @@ public class ProfileRequestService {
   public BusinessProfileRequestResponse getProfileRequest(String requestId) {
     BusinessProfileRequestEntity requestEntity = _businessProfileRequestRepository.findByRequestId(requestId);
     List<BusinessProfileRequestProductValidation> businessProfileRequestProductValidations =
-        _profileValidationService.getRequestProductValidations(requestId);
+        _profileProductValidationService.getRequestProductValidations(requestId);
     if(requestEntity == null) {
       logger.error("Business profile request with id: " + requestId + " not found");
       throw new BusinessProfileRequestNotFoundException("Business profile request with id: " + requestId + " not found");

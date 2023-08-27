@@ -1,9 +1,6 @@
 package com.example.BusinessProfileManagement.kafka;
 
 import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
-import com.example.BusinessProfileManagement.service.ProfileValidationService;
-import com.google.common.util.concurrent.ListenableFuture;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 
 @Service

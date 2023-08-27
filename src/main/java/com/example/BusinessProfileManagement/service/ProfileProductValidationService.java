@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class ProfileProductValidationService {
   Logger logger = LoggerFactory.getLogger(ProfileProductValidationService.class);
@@ -31,7 +30,7 @@ public class ProfileProductValidationService {
     return validations;
   }
 
-  public BusinessProfileRequestProductValidation getBusinessProfileRequestProductValidation(
+  public BusinessProfileRequestProductValidation saveBusinessProfileRequestProductValidation(
       BusinessProfileRequestProductValidation validation) {
     _businessProfileRequestProductValidationRepository.saveAndFlush(BusinessProfileRequestProductValidationMapper.INSTANCE.dtoToEntity(
         validation));

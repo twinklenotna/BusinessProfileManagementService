@@ -17,6 +17,7 @@ import com.example.BusinessProfileManagement.model.enums.RequestType;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestProductValidationRepository;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,6 +74,10 @@ public class ProfileValidationServiceTest {
     BusinessProfileRequestProductValidationEntity businessProfileRequestProductValidationEntity =
         ProductValidationHelper
             .createProfileRequestProductValidationEntity(businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED);
+    List<BusinessProfileRequestProductValidation> businessProfileRequestProductValidations =
+        ProductValidationHelper
+            .createProfileRequestProductValidations(3, businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED);
+
 
     when(businessProfileService.getProfileById(any())).thenReturn(profile);
     when(profileSubscriptionService.getSubscriptions(any())).thenReturn(new HashSet<>(
@@ -81,7 +86,9 @@ public class ProfileValidationServiceTest {
     when(businessProfileRequestProductValidationRepository.saveAndFlush(any())).thenReturn(businessProfileRequestProductValidationEntity);
     when(profileRequestService.updateBusinessProfileRequestEntity(any())).thenReturn(businessProfileRequestEntity);
     when(_profileProductValidationService.getRequestProductValidations(businessProfileRequest.getRequestId()))
-        .thenReturn(ProductValidationHelper.createProfileRequestProductValidations(3, businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED));
+        .thenReturn(businessProfileRequestProductValidations);
+    when(_profileProductValidationService.saveBusinessProfileRequestProductValidation(any()))
+        .thenReturn(businessProfileRequestProductValidations.get(0));
 
 
     boolean requestValidated = profileValidationService.validateRequest(businessProfileRequest);
@@ -114,6 +121,8 @@ public class ProfileValidationServiceTest {
     when(profileRequestService.updateBusinessProfileRequestEntity(any())).thenReturn(businessProfileRequestEntity);
     when(_profileProductValidationService.getRequestProductValidations(businessProfileRequest.getRequestId()))
         .thenReturn(ProductValidationHelper.createProfileRequestProductValidations(3, businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED));
+    when(_profileProductValidationService.saveBusinessProfileRequestProductValidation(any()))
+        .thenReturn(businessProfileRequestProductValidation);
 
 
     boolean requestValidated = profileValidationService.validateRequest(businessProfileRequest);
@@ -138,6 +147,8 @@ public class ProfileValidationServiceTest {
         ProductValidationHelper
             .createProfileRequestProductValidationEntity(businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED);
 
+    when(_profileProductValidationService.saveBusinessProfileRequestProductValidation(any()))
+        .thenReturn(businessProfileRequestProductValidation);
     when(businessProfileService.getProfileById(any())).thenReturn(profile);
     when(profileSubscriptionService.getSubscriptions(any())).thenReturn(new HashSet<>(
         Arrays.asList("product1", "product2")));

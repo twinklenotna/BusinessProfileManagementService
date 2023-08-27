@@ -6,7 +6,6 @@ import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
-import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestProductValidationMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestProductValidationRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -110,7 +109,8 @@ public class ProfileValidationService {
       BusinessProfileRequestProductValidation validation = _productValidationFactory
           .validateProfile(productId, profile);
       validation.setRequestId(requestId);
-      return _profileProductValidationService.getBusinessProfileRequestProductValidation(validation);
+      _profileProductValidationService.saveBusinessProfileRequestProductValidation(validation);
+      return validation;
     });
   }
 

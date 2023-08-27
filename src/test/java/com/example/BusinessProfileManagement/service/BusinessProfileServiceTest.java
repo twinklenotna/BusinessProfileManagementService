@@ -1,27 +1,23 @@
 package com.example.BusinessProfileManagement.service;
 
 import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundException;
-import com.example.BusinessProfileManagement.exception.BusinessProfileValidationException;
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.kafka.ProfileUpdateRequestProducer;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileMapper;
-import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRepository;
-import com.example.BusinessProfileManagement.repository.BusinessProfileRequestRepository;
-import java.util.Arrays;
+
 import java.util.HashSet;
-import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -51,11 +47,11 @@ public class BusinessProfileServiceTest {
   public void testUpdateProfile() {
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
 
-    BusinessProfileRequest businessProfileRequest =
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.UPDATE);
 
     when(profileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>()))
-        .thenReturn(businessProfileRequest);
+        .thenReturn(businessProfileUpdateRequest);
 
     businessProfileService.updateProfile(profile);
 
@@ -69,7 +65,7 @@ public class BusinessProfileServiceTest {
     BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
 
     when(profileRepository.save(any())).thenReturn(profileEntity);
-    when(businessProfileMapper.dtoToEntity(profile)).thenReturn(profileEntity);
+    when(businessProfileMapper.toEntity(profile)).thenReturn(profileEntity);
 
     businessProfileService.updateBusinessProfileEntity(profile);
 
@@ -79,12 +75,12 @@ public class BusinessProfileServiceTest {
   @Test
   public void testUpdateProfileWithSubscriptions() {
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-    BusinessProfileRequest businessProfileRequest = ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE);
+    BusinessProfileUpdateRequest businessProfileUpdateRequest = ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE);
 
     when(profileRequestService.createBusinessProfileRequest(eq(profile), eq(RequestType.SUBSCRIBE), any()))
-        .thenReturn(businessProfileRequest);
+        .thenReturn(businessProfileUpdateRequest);
 
-    businessProfileService.updateProfile(profile, businessProfileRequest.getSubscriptions());
+    businessProfileService.updateProfile(profile, businessProfileUpdateRequest.getSubscriptions());
 
     verify(profileRequestService, times(1)).createBusinessProfileRequest(eq(profile), eq(RequestType.SUBSCRIBE), any());
     verify(profileUpdateRequestProducer, times(1)).sendProfileUpdateRequestWithKey(any(), any());
@@ -94,13 +90,13 @@ public class BusinessProfileServiceTest {
   public void testCreateProfileRequest() {
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
     BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
-    BusinessProfileRequest businessProfileRequest =
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.CREATE);
 
     when(profileRepository.save(any())).thenReturn(profileEntity);
     when(profileRequestService.createBusinessProfileRequest(profile, RequestType.CREATE, new HashSet<>()))
-        .thenReturn(businessProfileRequest);
-    when(businessProfileMapper.dtoToEntity(profile)).thenReturn(profileEntity);
+        .thenReturn(businessProfileUpdateRequest);
+    when(businessProfileMapper.toEntity(profile)).thenReturn(profileEntity);
 
     String profileId = businessProfileService.createProfileRequest(profile);
 
@@ -131,8 +127,8 @@ public class BusinessProfileServiceTest {
     BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
 
     when(profileRepository.getProfileById(PROFILE_ID)).thenReturn(profileEntity);
-    when(businessProfileMapper.dtoToEntity(profile)).thenReturn(profileEntity);
-    when(businessProfileMapper.entityToDto(profileEntity)).thenReturn(profile);
+    when(businessProfileMapper.toEntity(profile)).thenReturn(profileEntity);
+    when(businessProfileMapper.toDto(profileEntity)).thenReturn(profile);
 
     BusinessProfile profileResponse = businessProfileService.getProfileById(PROFILE_ID);
 

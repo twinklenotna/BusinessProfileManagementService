@@ -2,28 +2,24 @@ package com.example.BusinessProfileManagement.repository;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBSaveExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
-import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequestEntity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class BusinessProfileRequestRepository {
-  final DynamoDBMapper _dynamoDBMapper;
+  final DynamoDBMapper dynamoDBMapper;
 
-  public BusinessProfileRequestRepository(DynamoDBMapper _dynamoDBMapper) {
-    this._dynamoDBMapper = _dynamoDBMapper;
+  public BusinessProfileRequestRepository(DynamoDBMapper dynamoDBMapper) {
+    this.dynamoDBMapper = dynamoDBMapper;
   }
 
   public BusinessProfileRequestEntity saveAndUpdate(BusinessProfileRequestEntity businessProfileRequestEntity) {
-    _dynamoDBMapper.save(businessProfileRequestEntity);
+    dynamoDBMapper.save(businessProfileRequestEntity);
     return businessProfileRequestEntity;
   }
 
@@ -38,15 +34,12 @@ public class BusinessProfileRequestRepository {
             .withHashKeyValues(businessProfileRequestEntity)
             .withIndexName(gsiName)
             .withConsistentRead(false);
-
-
-    List<BusinessProfileRequestEntity> queryResult = _dynamoDBMapper.query(BusinessProfileRequestEntity.class, queryExpression);
-
-    return queryResult;
+    List<BusinessProfileRequestEntity> results = dynamoDBMapper.query(BusinessProfileRequestEntity.class, queryExpression);
+    return results;
   }
 
   public BusinessProfileRequestEntity findByRequestId(String requestId) {
-    return _dynamoDBMapper.load(BusinessProfileRequestEntity.class, requestId);
+    return dynamoDBMapper.load(BusinessProfileRequestEntity.class, requestId);
   }
 }
 

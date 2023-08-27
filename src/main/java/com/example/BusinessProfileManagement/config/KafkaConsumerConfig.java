@@ -1,7 +1,7 @@
 package com.example.BusinessProfileManagement.config;
 
 import com.example.BusinessProfileManagement.exception.BusinessProfileValidationClientException;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.service.ProfileRequestService;
 import java.util.HashMap;
@@ -46,7 +46,7 @@ class KafkaConsumerConfig {
   public DefaultErrorHandler errorHandler(ProfileRequestService profileRequestService) {
     BackOff fixedBackOff = new FixedBackOff(interval, maxAttempts);
     DefaultErrorHandler errorHandler = new DefaultErrorHandler((consumerRecord, exception) -> {
-      profileRequestService.updateRequestStatus((BusinessProfileRequest) consumerRecord.value(), ApprovalStatus.FAILED);
+      profileRequestService.updateRequestStatus((BusinessProfileUpdateRequest) consumerRecord.value(), ApprovalStatus.FAILED);
     }, fixedBackOff);
     errorHandler.addRetryableExceptions(BusinessProfileValidationClientException.class);
     errorHandler.addNotRetryableExceptions(NullPointerException.class);
@@ -60,7 +60,7 @@ class KafkaConsumerConfig {
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
     props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
-    props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, BusinessProfileRequest.class.getName());
+    props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, BusinessProfileUpdateRequest.class.getName());
     return props;
   }
 

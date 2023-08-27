@@ -1,7 +1,7 @@
 package com.example.BusinessProfileManagement.helper;
 
 import com.example.BusinessProfileManagement.model.BusinessProfile;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequestEntity;
@@ -16,18 +16,18 @@ import java.util.UUID;
 
 public class ProfileRequestHelper {
 
-  public static BusinessProfileRequest createBusinessProfileRequest(BusinessProfile businessProfile, RequestType requestType) {
-    BusinessProfileRequest businessProfileRequest = new BusinessProfileRequest();
-    businessProfileRequest.setBusinessProfile(businessProfile);
-    businessProfileRequest.setProfileId(businessProfile.getProfileId());
-    businessProfileRequest.setRequestId(UUID.randomUUID().toString());
-    businessProfileRequest.setStatus(ApprovalStatus.IN_PROGRESS);
-    businessProfileRequest.setRequestType(requestType);
+  public static BusinessProfileUpdateRequest createBusinessProfileRequest(BusinessProfile businessProfile, RequestType requestType) {
+    BusinessProfileUpdateRequest businessProfileUpdateRequest = new BusinessProfileUpdateRequest();
+    businessProfileUpdateRequest.setBusinessProfile(businessProfile);
+    businessProfileUpdateRequest.setProfileId(businessProfile.getProfileId());
+    businessProfileUpdateRequest.setRequestId(UUID.randomUUID().toString());
+    businessProfileUpdateRequest.setStatus(ApprovalStatus.IN_PROGRESS);
+    businessProfileUpdateRequest.setRequestType(requestType);
     Set<String> subscriptions = new HashSet<>();
     subscriptions.add("Subscription1");
     subscriptions.add("Subscription2");
-    businessProfileRequest.setSubscriptions(subscriptions);
-    return businessProfileRequest;
+    businessProfileUpdateRequest.setSubscriptions(subscriptions);
+    return businessProfileUpdateRequest;
   }
 
   public static BusinessProfileRequestResponse createBusinessProfileRequestResponse(BusinessProfile businessProfile, RequestType requestType) {
@@ -62,13 +62,13 @@ public class ProfileRequestHelper {
     return businessProfileRequest;
   }
 
-  public static List<BusinessProfileRequest> createBusinessProfileRequests(int requests, String profileId) {
-    List<BusinessProfileRequest> businessProfileRequests = new ArrayList<>();
+  public static List<BusinessProfileUpdateRequest> createBusinessProfileRequests(int requests, String profileId) {
+    List<BusinessProfileUpdateRequest> businessProfileUpdateRequests = new ArrayList<>();
     for (int i = 0; i < requests; i++) {
-      businessProfileRequests.add(
+      businessProfileUpdateRequests.add(
           createBusinessProfileRequest(ProfileHelper.createBusinessProfile(profileId), RequestType.UPDATE));
     }
-    return businessProfileRequests;
+    return businessProfileUpdateRequests;
   }
 
   public static List<BusinessProfileRequestEntity> createBusinessProfileEntityRequests(int requests, String profileId) {

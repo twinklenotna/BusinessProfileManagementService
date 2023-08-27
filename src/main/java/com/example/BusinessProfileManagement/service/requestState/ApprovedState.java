@@ -1,6 +1,6 @@
 package com.example.BusinessProfileManagement.service.requestState;
 
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.ProfileSubscription;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
@@ -24,8 +24,8 @@ public class ApprovedState implements ConsumerState {
   }
 
   @Override
-  public void processRequest(BusinessProfileRequest request,
-      BusinessProfileRequestContext businessProfileRequestContext) {
+  public void processRequest(BusinessProfileUpdateRequest request,
+                             BusinessProfileRequestContext businessProfileRequestContext) {
     request.setStatus(ApprovalStatus.APPROVED);
     _profileRequestService.updateBusinessProfileRequestEntity(request);
     _businessProfileService.updateBusinessProfileEntity(request.getBusinessProfile());

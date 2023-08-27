@@ -1,8 +1,9 @@
 package com.example.BusinessProfileManagement.config;
 
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,7 @@ class KafkaProducerConfig {
   private String bootstrapServers;
 
   @Bean
-  public ProducerFactory<String, BusinessProfileRequest> producerFactory() {
+  public ProducerFactory<String, BusinessProfileUpdateRequest> producerFactory() {
     Map<String, Object> configProps = new HashMap<>();
     configProps.put(
         ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -36,7 +37,7 @@ class KafkaProducerConfig {
   }
 
   @Bean
-  public KafkaTemplate<String, BusinessProfileRequest> kafkaTemplate() {
+  public KafkaTemplate<String, BusinessProfileUpdateRequest> kafkaTemplate() {
     return new KafkaTemplate<>(producerFactory());
   }
 }

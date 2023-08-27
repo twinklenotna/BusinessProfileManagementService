@@ -1,7 +1,7 @@
 package com.example.BusinessProfileManagement.service.requestState;
 
 import com.example.BusinessProfileManagement.exception.BusinessProfileValidationException;
-import com.example.BusinessProfileManagement.model.BusinessProfileRequest;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.service.ProfileValidationService;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +15,8 @@ public class InProgressState implements ConsumerState {
   }
 
   @Override
-  public void processRequest(BusinessProfileRequest request,
-      BusinessProfileRequestContext businessProfileRequestContext) {
+  public void processRequest(BusinessProfileUpdateRequest request,
+                             BusinessProfileRequestContext businessProfileRequestContext) {
     System.out.println("Request is in progress.");
     try {
       if (_profileValidationService.validateRequest(request)) {

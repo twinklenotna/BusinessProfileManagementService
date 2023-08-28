@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AddressConverter implements DynamoDBTypeConverter<String, AddressEntity> {
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  public ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   public String convert(AddressEntity addressEntity) {

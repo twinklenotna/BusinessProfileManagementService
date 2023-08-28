@@ -16,6 +16,14 @@ import java.util.UUID;
 
 public class ProfileRequestHelper {
 
+  public static BusinessProfileUpdateRequest createBusinessProfileRequest(String profileId) {
+    return createBusinessProfileRequest(ProfileHelper.createBusinessProfile(profileId), RequestType.UPDATE);
+  }
+
+  public static BusinessProfileUpdateRequest createBusinessProfileRequest(String profileId, RequestType request) {
+    return createBusinessProfileRequest(ProfileHelper.createBusinessProfile(profileId), request);
+  }
+
   public static BusinessProfileUpdateRequest createBusinessProfileRequest(BusinessProfile businessProfile, RequestType requestType) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest = new BusinessProfileUpdateRequest();
     businessProfileUpdateRequest.setBusinessProfile(businessProfile);
@@ -30,6 +38,10 @@ public class ProfileRequestHelper {
     return businessProfileUpdateRequest;
   }
 
+  public static BusinessProfileRequestResponse createBusinessProfileRequestResponse(String profileId) {
+    return createBusinessProfileRequestResponse(ProfileHelper.createBusinessProfile(profileId), RequestType.UPDATE);
+  }
+
   public static BusinessProfileRequestResponse createBusinessProfileRequestResponse(BusinessProfile businessProfile, RequestType requestType) {
     BusinessProfileRequestResponse businessProfileRequest = new BusinessProfileRequestResponse();
     businessProfileRequest.setBusinessProfile(businessProfile);
@@ -39,7 +51,14 @@ public class ProfileRequestHelper {
     businessProfileRequest.setRequestType(requestType);
     businessProfileRequest.setSubscriptionValidations(ProductValidationHelper
         .createProfileRequestProductValidations(2, businessProfileRequest.getRequestId(), ApprovalStatus.APPROVED));
+    businessProfileRequest.setComments("comments");
     return businessProfileRequest;
+  }
+
+  public static BusinessProfileRequestEntity createBusinessProfileRequestEntity(
+      String profileId) {
+    return createBusinessProfileRequestEntity(ProfileHelper.createBusinessProfileEntity(profileId),
+        RequestType.UPDATE, ApprovalStatus.IN_PROGRESS);
   }
 
   public static BusinessProfileRequestEntity createBusinessProfileRequestEntity(

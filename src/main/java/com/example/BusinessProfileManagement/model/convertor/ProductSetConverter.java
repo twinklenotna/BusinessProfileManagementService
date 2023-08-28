@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class ProductSetConverter implements DynamoDBTypeConverter<String, Set<String>> {
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  public ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   public String convert(Set<String> products) {

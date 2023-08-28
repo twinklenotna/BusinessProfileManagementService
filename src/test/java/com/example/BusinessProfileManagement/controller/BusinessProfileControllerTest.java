@@ -4,11 +4,19 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundException;
+import com.example.BusinessProfileManagement.exception.BusinessProfileRequestNotFoundException;
+import com.example.BusinessProfileManagement.helper.ProfileHelper;
+import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
+import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.service.BusinessProfileService;
 import com.example.BusinessProfileManagement.service.ProfileRequestService;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class BusinessProfileControllerTest {
@@ -99,5 +107,58 @@ public class BusinessProfileControllerTest {
     assertNull(response.getBody());
   }
 
+  @Test
+  public void testGetProfileUpdateRequests() {
+    // Arrange
+    String profileId = "123";
+    List<BusinessProfileUpdateRequest> requests = ProfileRequestHelper.createBusinessProfileRequests(3, profileId);
+
+    when(profileRequestService.getProfileUpdateRequestsByProfileId(profileId))
+        .thenReturn(requests);
+
+    ResponseEntity<List<BusinessProfileUpdateRequest>> response =
+        controller.getProfileUpdateRequests(profileId);
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(requests, response.getBody());
+  }
+
+  @Test
+  public void testGetProfileUpdateRequest() {
+    String profileId = "123";
+    String requestId = "456";
+    BusinessProfileRequestResponse requestResponse = ProfileRequestHelper.createBusinessProfileRequestResponse(profileId);
+    requestResponse.setRequestId(requestId);
+
+    when(profileRequestService.getProfileUpdateRequest(requestId))
+        .thenReturn(requestResponse);
+
+    ResponseEntity<BusinessProfileRequestResponse> response =
+        controller.getProfileUpdateRequests(profileId, requestId);
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(requestResponse.getRequestId(), response.getBody().getRequestId());
+    assertEquals(requestResponse.getBusinessProfile(), response.getBody().getBusinessProfile());
+    assertEquals(requestResponse.getProfileId(), response.getBody().getProfileId());
+    assertEquals(requestResponse.getRequestType(), response.getBody().getRequestType());
+    assertEquals(requestResponse.getStatus(), response.getBody().getStatus());
+    assertEquals(requestResponse.getComments(), response.getBody().getComments());
+    assertEquals(requestResponse.getSubscriptionValidations(), response.getBody().getSubscriptionValidations());
+  }
+
+
+  @Test
+  public void testGetProfileUpdateRequest_NotFound() {
+    String profileId = "123";
+    String requestId = "456";
+
+    when(profileRequestService.getProfileUpdateRequest(requestId))
+        .thenThrow(new BusinessProfileRequestNotFoundException("request not found"));
+
+    ResponseEntity<BusinessProfileRequestResponse> response =
+        controller.getProfileUpdateRequests(profileId, requestId);
+
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+  }
 }
 

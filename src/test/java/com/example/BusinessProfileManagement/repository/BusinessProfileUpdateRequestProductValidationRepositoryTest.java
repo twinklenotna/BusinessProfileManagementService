@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.example.BusinessProfileManagement.helper.ProductValidationHelper;
+import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequestProductValidationEntity;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import java.util.Collections;
@@ -23,9 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 public class BusinessProfileUpdateRequestProductValidationRepositoryTest {
-
+  String REQUEST_ID = "testRequestId";
   @Mock
   private DynamoDBMapper dynamoDBMapper;
+
 
   @InjectMocks
   private BusinessProfileRequestProductValidationRepository repository;
@@ -37,8 +39,8 @@ public class BusinessProfileUpdateRequestProductValidationRepositoryTest {
 
   @Test
   public void testSaveAndFlush() {
-    BusinessProfileRequestProductValidationEntity entity = new BusinessProfileRequestProductValidationEntity();
-    entity.setRequestId("testRequestId");
+    BusinessProfileRequestProductValidationEntity entity =
+        ProductValidationHelper.createProfileRequestProductValidationEntity(REQUEST_ID, ApprovalStatus.APPROVED);
 
     doNothing().when(dynamoDBMapper).save(entity);
 
@@ -51,14 +53,11 @@ public class BusinessProfileUpdateRequestProductValidationRepositoryTest {
 
   @Test
   public void testFindByRequestId() {
-    String requestId = "testRequestId";
-
     PaginatedQueryList<BusinessProfileRequestProductValidationEntity> queryResult =
         mock(PaginatedQueryList.class);
 
     BusinessProfileRequestProductValidationEntity entity =
-        ProductValidationHelper.createProfileRequestProductValidationEntity(requestId, ApprovalStatus.APPROVED);
-    entity.setRequestId(requestId);
+        ProductValidationHelper.createProfileRequestProductValidationEntity(REQUEST_ID, ApprovalStatus.APPROVED);
 
     when(queryResult.iterator()).thenReturn(Collections.singletonList(entity).iterator());
 
@@ -67,7 +66,7 @@ public class BusinessProfileUpdateRequestProductValidationRepositoryTest {
         any(DynamoDBQueryExpression.class)
     )).thenReturn(queryResult);
 
-    List<BusinessProfileRequestProductValidationEntity> results = repository.findByRequestId(requestId);
+    List<BusinessProfileRequestProductValidationEntity> results = repository.findByRequestId(REQUEST_ID);
 
     verify(dynamoDBMapper, times(1)).query(
         eq(BusinessProfileRequestProductValidationEntity.class),

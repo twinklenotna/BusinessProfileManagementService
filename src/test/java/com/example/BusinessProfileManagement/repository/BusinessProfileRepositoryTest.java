@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class BusinessProfileRepositoryTest {
-
+  private final String PROFILE_ID = "12346";
   @Mock
   private DynamoDBMapper dynamoDBMapper;
 
@@ -26,8 +27,7 @@ public class BusinessProfileRepositoryTest {
 
   @Test
   public void testSave() {
-    BusinessProfileEntity profile = new BusinessProfileEntity();
-    profile.setProfileId("testProfileId");
+    BusinessProfileEntity profile = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
 
     doNothing().when(dynamoDBMapper).save(profile);
 
@@ -35,35 +35,40 @@ public class BusinessProfileRepositoryTest {
 
     verify(dynamoDBMapper, times(1)).save(profile);
 
+    assertEquals(profile.getProfileId(), savedProfile.getProfileId());
+    assertEquals(profile.getStatus(), savedProfile.getStatus());
+    assertEquals(profile.getEmail(), savedProfile.getEmail());
+    assertEquals(profile.getBusinessAddress(), savedProfile.getBusinessAddress());
+    assertEquals(profile.getWebsite(), savedProfile.getWebsite());
+    assertEquals(profile.getLegalAddress(), savedProfile.getLegalAddress());
+    assertEquals(profile.getCompanyName(), savedProfile.getCompanyName());
+    assertEquals(profile.getLegalName(), savedProfile.getLegalName());
+    assertEquals(profile.getTaxInfoEntity(), savedProfile.getTaxInfoEntity());
     assertEquals(profile, savedProfile);
   }
 
   @Test
   public void testGetProfileById() {
-    String profileId = "testProfileId";
-    BusinessProfileEntity expectedProfile = new BusinessProfileEntity();
-    expectedProfile.setProfileId(profileId);
+    BusinessProfileEntity profile = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
 
-    when(dynamoDBMapper.load(BusinessProfileEntity.class, profileId)).thenReturn(expectedProfile);
+    when(dynamoDBMapper.load(BusinessProfileEntity.class, PROFILE_ID)).thenReturn(profile);
 
-    BusinessProfileEntity retrievedProfile = businessProfileRepository.getProfileById(profileId);
+    BusinessProfileEntity retrievedProfile = businessProfileRepository.getProfileById(PROFILE_ID);
 
-    verify(dynamoDBMapper, times(1)).load(BusinessProfileEntity.class, profileId);
+    verify(dynamoDBMapper, times(1)).load(BusinessProfileEntity.class, PROFILE_ID);
 
-    assertEquals(expectedProfile, retrievedProfile);
+    assertEquals(profile, retrievedProfile);
   }
 
   @Test
   public void testDelete() {
-    String profileId = "testProfileId";
-    BusinessProfileEntity expectedProfile = new BusinessProfileEntity();
-    expectedProfile.setProfileId(profileId);
+    BusinessProfileEntity expectedProfile = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
 
-    when(dynamoDBMapper.load(BusinessProfileEntity.class, profileId)).thenReturn(expectedProfile);
+    when(dynamoDBMapper.load(BusinessProfileEntity.class, PROFILE_ID)).thenReturn(expectedProfile);
 
-    businessProfileRepository.delete(profileId);
+    businessProfileRepository.delete(PROFILE_ID);
 
-    verify(dynamoDBMapper, times(1)).load(BusinessProfileEntity.class, profileId);
+    verify(dynamoDBMapper, times(1)).load(BusinessProfileEntity.class, PROFILE_ID);
     verify(dynamoDBMapper, times(1)).delete(expectedProfile);
   }
 }

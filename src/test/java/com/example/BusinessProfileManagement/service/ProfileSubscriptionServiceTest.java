@@ -79,6 +79,7 @@ public class ProfileSubscriptionServiceTest {
     Set<String> subscriptions = new HashSet<>(Arrays.asList("product1", "product2"));
     ProfileSubscriptionEntity profileSubscriptionEntity = new ProfileSubscriptionEntity();
     profileSubscriptionEntity.setSubscriptions(new HashSet<>(Arrays.asList("existingProduct")));
+    profileSubscriptionEntity.setProfileId(profileId);
 
     when(profileSubscriptionRepository.getProfileById(profileId)).thenReturn(profileSubscriptionEntity);
     when(profileSubscriptionRepository.save(any())).thenReturn(profileSubscriptionEntity);

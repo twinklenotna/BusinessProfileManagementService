@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,5 +39,22 @@ public class ProductSetConverterTest {
     Set<String> unconverted = converter.unconvert(json);
 
     assertEquals(products, unconverted);
+  }
+
+  @Test
+  public void testConvertWithJsonProcessingException() throws JsonProcessingException {
+    Set<String> products = Mockito.mock(Set.class);
+
+    converter.objectMapper = Mockito.mock(ObjectMapper.class);
+    Mockito.when(converter.objectMapper.writeValueAsString(Mockito.any())).thenThrow(JsonProcessingException.class);
+
+    assertThrows(IllegalArgumentException.class, () -> converter.convert(products));
+  }
+
+  @Test
+  public void testUnconvertWithJsonProcessingException() {
+    String invalidJson = "{invalidJson}";
+
+    assertThrows(IllegalArgumentException.class, () -> converter.unconvert(invalidJson));
   }
 }

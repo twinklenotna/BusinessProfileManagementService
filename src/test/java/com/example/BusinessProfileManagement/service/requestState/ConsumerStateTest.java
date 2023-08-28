@@ -62,7 +62,7 @@ public class ConsumerStateTest {
     context.processRequest(request);
 
     verify(_profileValidationService, times(1)).validateRequest(eq(request));
-    verify(_profileSubscriptionService, times(1)).subscribe(eq(profileSubscription));
+    verify(_profileSubscriptionService, times(1)).addSubscriptions(eq(PROFILE_ID), eq(request.getSubscriptions()));
     verify(_profileRequestService, times(1)).updateBusinessProfileRequestEntity(any());
     verify(_businessProfileService, times(1)).updateBusinessProfileEntity(request.getBusinessProfile());
   }

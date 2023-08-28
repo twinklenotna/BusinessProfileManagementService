@@ -150,6 +150,14 @@
 							<goal>check</goal>
 						</goals>
 						<configuration>
+							<excludes>
+								<exclude>com.example.BusinessProfileManagement.client.*</exclude>
+								<exclude>com.example.BusinessProfileManagement.config.*</exclude>
+								<exclude>com.example.BusinessProfileManagement.factory.*</exclude>
+								<exclude>com.example.BusinessProfileManagement.model.mapper.*</exclude>
+								<exclude>com.example.BusinessProfileManagement.exception.*</exclude>
+								<exclude>com.example.BusinessProfileManagement.BusinessProfileManagementApplication.class</exclude>
+							</excludes>
 							<rules>
 								<rule>
 									<element>BUNDLE</element>
@@ -166,12 +174,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<excludes>
-						<exclude>com.example.BusinessProfileManagement.client.*</exclude>
-						<exclude>com.example.BusinessProfileManagement.config.*</exclude>
-						<exclude>com.example.BusinessProfileManagement.factory.*</exclude>
-						<exclude>com.example.BusinessProfileManagement.BusinessProfileManagementApplication.class</exclude>
-					</excludes>
 					<rules>
 						<rule>
 							<element>PACKAGE</element>

@@ -5,8 +5,10 @@ import com.example.BusinessProfileManagement.model.entity.AddressEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 
 public class AddressConverterTest {
@@ -32,5 +34,22 @@ public class AddressConverterTest {
     AddressEntity unconverted = addressConverter.unconvert(json);
 
     assertEquals(addressEntity, unconverted);
+  }
+
+  @Test
+  public void testConvertWithJsonProcessingException() throws JsonProcessingException {
+    AddressEntity addressEntity = Mockito.mock(AddressEntity.class);
+
+    addressConverter.objectMapper = Mockito.mock(ObjectMapper.class);
+    Mockito.when(addressConverter.objectMapper.writeValueAsString(Mockito.any())).thenThrow(JsonProcessingException.class);
+
+    assertThrows(IllegalArgumentException.class, () -> addressConverter.convert(addressEntity));
+  }
+
+  @Test
+  public void testUnconvertWithJsonProcessingException() {
+    String invalidJson = "{invalidJson}";
+
+    assertThrows(IllegalArgumentException.class, () -> addressConverter.unconvert(invalidJson));
   }
 }

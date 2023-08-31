@@ -48,9 +48,10 @@ public class BusinessProfileControllerTest {
 
   @Test
   public void testCreateProfile() {
-    BusinessProfile profile = new BusinessProfile();
+    String profileId = "testProfileId";
+    BusinessProfile profile = ProfileHelper.createBusinessProfile(profileId);
 
-    when(profileService.createProfileRequest(profile)).thenReturn("testProfileId");
+    when(profileService.createProfileRequest(profile)).thenReturn(profile);
 
     ResponseEntity<String> response = controller.createProfile(profile);
 

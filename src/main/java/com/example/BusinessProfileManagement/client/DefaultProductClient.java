@@ -38,7 +38,14 @@ public class DefaultProductClient implements ProductClient {
     try {
 //      ResponseEntity<ApprovalStatus> response = sendRequest(profile, validateUrl);
 //      businessProfileRequestProductValidation.setStatus(response.getBody());
-      businessProfileRequestProductValidation.setStatus(ApprovalStatus.APPROVED);
+      if(profile.getProfileId().contains("fail")) {
+        businessProfileRequestProductValidation.setStatus(ApprovalStatus.FAILED);
+      } else if(profile.getProfileId().contains("reject")) {
+        businessProfileRequestProductValidation.setStatus(ApprovalStatus.REJECTED);
+      } else {
+        businessProfileRequestProductValidation.setStatus(ApprovalStatus.APPROVED);
+      }
+
       return businessProfileRequestProductValidation;
     } catch (BusinessProfileValidationClientException ex) {
       logger.error("Unable to validate request against productId: "+ product);

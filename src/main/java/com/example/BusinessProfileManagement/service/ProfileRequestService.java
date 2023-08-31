@@ -3,6 +3,7 @@ package com.example.BusinessProfileManagement.service;
 import com.example.BusinessProfileManagement.exception.BusinessProfileRequestException;
 import com.example.BusinessProfileManagement.exception.BusinessProfileRequestNotFoundException;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
@@ -10,6 +11,7 @@ import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequest
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileMapper;
+import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchRequestMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestResponseMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestRepository;
@@ -32,10 +34,11 @@ public class ProfileRequestService {
   private  final BusinessProfileRequestMapper businessProfileRequestMapper;
   private  final ProfileProductValidationService profileProductValidationService;
   private  final BusinessProfileRequestResponseMapper businessProfileRequestResponseMapper;
+  private  final BusinessProfilePatchRequestMapper businessProfilePatchRequestMapper;
 
 
-  public List<BusinessProfileUpdateRequest> getProfileUpdateRequestsByProfileId(String profileId) {
-    List<BusinessProfileRequestEntity> businessProfileRequestEntities = businessProfileRequestRepository.findByProfileId(profileId);
+  public List<BusinessProfileUpdateRequest> getProfileUpdateRequestsByprofileId(String profileId) {
+    List<BusinessProfileRequestEntity> businessProfileRequestEntities = businessProfileRequestRepository.findByprofileId(profileId);
     List<BusinessProfileUpdateRequest> businessProfileUpdateRequests = new ArrayList<>();
     for(BusinessProfileRequestEntity businessProfileRequestEntity : businessProfileRequestEntities) {
       businessProfileUpdateRequests.add(businessProfileRequestMapper.entityToDto(businessProfileRequestEntity));
@@ -69,9 +72,9 @@ public class ProfileRequestService {
     }
   }
 
-  BusinessProfileUpdateRequest createBusinessProfileRequest(BusinessProfile profile, RequestType requestType, Set<String> subscriptions) {
+  BusinessProfileUpdateRequest createBusinessProfileRequest(BusinessProfilePatchRequest profile, RequestType requestType, Set<String> subscriptions) {
     BusinessProfileRequestEntity requestEntity = new BusinessProfileRequestEntity();
-    requestEntity.setBusinessProfile(businessProfileMapper.toEntity(profile));
+    requestEntity.setBusinessProfile(businessProfilePatchRequestMapper.toEntity(profile));
     requestEntity.setProfileId(profile.getProfileId());
     requestEntity.setStatus(ApprovalStatus.IN_PROGRESS);
     requestEntity.setRequestType(requestType);

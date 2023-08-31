@@ -5,7 +5,6 @@ import com.example.BusinessProfileManagement.exception.BusinessProfileRequestNot
 import com.example.BusinessProfileManagement.helper.ProductValidationHelper;
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
-import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
@@ -29,11 +28,11 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ProfileRequestServiceTest {
+public class BusinessProfileRequestServiceTest {
   private final String PROFILE_ID = "12346";
 
   @InjectMocks
-  private ProfileRequestService profileRequestService;
+  private BusinessProfileRequestService _businessProfileRequestService;
 
   @Mock
   private BusinessProfileRequestRepository businessProfileRequestRepository;
@@ -44,7 +43,8 @@ public class ProfileRequestServiceTest {
   @Mock
   private ProfileSubscriptionService profileSubscriptionService;
 
-  @Mock ProfileProductValidationService _profileProductValidationService;
+  @Mock
+  BusinessProfileProductValidationService _businessProfileProductValidationService;
   @Mock
   BusinessProfileRequestMapper _businessProfileRequestMapper;
   @Mock
@@ -70,7 +70,7 @@ public class ProfileRequestServiceTest {
         .thenReturn(ProfileRequestHelper
             .createBusinessProfileRequest(ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID), RequestType.CREATE));
 
-    List<BusinessProfileUpdateRequest> requests = profileRequestService.getProfileUpdateRequestsByprofileId(PROFILE_ID);
+    List<BusinessProfileUpdateRequest> requests = _businessProfileRequestService.getProfileUpdateRequestsByprofileId(PROFILE_ID);
 
     assertNotNull(requests);
     assertEquals(requests.size(), 3);
@@ -86,11 +86,11 @@ public class ProfileRequestServiceTest {
     businessProfileRequestResponse.setRequestId(requestId);
 
     when(businessProfileRequestRepository.findByRequestId(requestId)).thenReturn(businessProfileRequestEntity);
-    when(_profileProductValidationService.getRequestProductValidations(requestId))
+    when(_businessProfileProductValidationService.getRequestProductValidations(requestId))
         .thenReturn(ProductValidationHelper.createProfileRequestProductValidations(3, requestId, ApprovalStatus.APPROVED));
     when(_businessProfileRequestResponseMapper.entityToDto(businessProfileRequestEntity)).thenReturn(businessProfileRequestResponse);
 
-    BusinessProfileRequestResponse request = profileRequestService.getProfileUpdateRequest(requestId);
+    BusinessProfileRequestResponse request = _businessProfileRequestService.getProfileUpdateRequest(requestId);
 
     assertNotNull(request);
   }
@@ -99,10 +99,10 @@ public class ProfileRequestServiceTest {
   public void testGetProfileRequestException() {
     String requestId = "12345";
     when(businessProfileRequestRepository.findByRequestId(requestId)).thenReturn(null);
-    when(_profileProductValidationService.getRequestProductValidations(requestId))
+    when(_businessProfileProductValidationService.getRequestProductValidations(requestId))
         .thenReturn(null);
     assertThrows(BusinessProfileRequestNotFoundException.class, () -> {
-      profileRequestService.getProfileUpdateRequest(requestId);
+      _businessProfileRequestService.getProfileUpdateRequest(requestId);
     });
   }
 
@@ -118,7 +118,7 @@ public class ProfileRequestServiceTest {
 
     when(businessProfileRequestRepository.saveAndUpdate(any())).thenReturn(businessProfileRequestEntity);
 
-    profileRequestService.updateRequestStatus(request, status);
+    _businessProfileRequestService.updateRequestStatus(request, status);
 
     verify(businessProfileRequestRepository, times(1)).saveAndUpdate(any());
   }
@@ -132,7 +132,7 @@ public class ProfileRequestServiceTest {
     when(businessProfileRequestRepository.saveAndUpdate(any())).thenThrow(new RuntimeException("exception while saving"));
 
     assertThrows(BusinessProfileRequestException.class, () -> {
-      profileRequestService.updateRequestStatus(request, ApprovalStatus.APPROVED);
+      _businessProfileRequestService.updateRequestStatus(request, ApprovalStatus.APPROVED);
     });
   }
 
@@ -149,7 +149,7 @@ public class ProfileRequestServiceTest {
     when(_businessProfilePatchRequestMapper.toEntity(businessProfile)).thenReturn(businessProfileEntity);
     when(_businessProfileRequestMapper.entityToDto(businessProfileRequestEntity)).thenReturn(request);
 
-    profileRequestService.createBusinessProfileRequest(businessProfile, RequestType.UPDATE, request.getSubscriptions());
+    _businessProfileRequestService.createBusinessProfileRequest(businessProfile, RequestType.UPDATE, request.getSubscriptions());
 
     verify(businessProfileRequestRepository, times(1)).saveAndUpdate(any());
   }

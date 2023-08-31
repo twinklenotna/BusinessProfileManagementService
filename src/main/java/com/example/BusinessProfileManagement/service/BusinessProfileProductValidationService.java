@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ProfileProductValidationService {
-  Logger logger = LoggerFactory.getLogger(ProfileProductValidationService.class);
+public class BusinessProfileProductValidationService {
+  Logger logger = LoggerFactory.getLogger(BusinessProfileProductValidationService.class);
   private final BusinessProfileRequestProductValidationRepository businessProfileRequestProductValidationRepository;
 
   public List<BusinessProfileRequestProductValidation> getRequestProductValidations(String requestId) {

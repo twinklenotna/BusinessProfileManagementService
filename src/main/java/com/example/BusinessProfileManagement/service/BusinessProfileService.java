@@ -10,7 +10,6 @@ import com.example.BusinessProfileManagement.model.enums.ProfileStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchMapper;
-import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRepository;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BusinessProfileService {
   Logger logger = LoggerFactory.getLogger(ProfileSubscriptionService.class);
   private final BusinessProfileRepository profileRepository;
-  private final ProfileRequestService profileRequestService;
+  private final BusinessProfileRequestService _businessProfileRequestService;
   private final ProfileUpdateRequestProducer profileUpdateRequestProducer;
   private final BusinessProfileMapper businessProfileMapper;
   private final BusinessProfilePatchMapper businessProfilePatchMapper;
@@ -41,7 +40,7 @@ public class BusinessProfileService {
   @Transactional
   public String updateProfile(BusinessProfilePatchRequest profile) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        profileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>());
+        _businessProfileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>());
     logger.info("created profile request with id: " + businessProfileUpdateRequest.getRequestId());
     sendProfileUpdateRequest(businessProfileUpdateRequest);
     return businessProfileUpdateRequest.getRequestId();
@@ -55,7 +54,7 @@ public class BusinessProfileService {
   @Transactional
   public String updateProfile(BusinessProfilePatchRequest profile, Set<String> subscriptions) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        profileRequestService.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE, subscriptions);
+        _businessProfileRequestService.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE, subscriptions);
     sendProfileUpdateRequest(businessProfileUpdateRequest);
     return businessProfileUpdateRequest.getRequestId();
   }
@@ -68,7 +67,7 @@ public class BusinessProfileService {
   @Transactional
   public String updateProfile(BusinessProfile profile, Set<String> subscriptions) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        profileRequestService.createBusinessProfileRequest(businessProfilePatchMapper.toPatchRequest(profile),
+        _businessProfileRequestService.createBusinessProfileRequest(businessProfilePatchMapper.toPatchRequest(profile),
             RequestType.SUBSCRIBE, subscriptions);
     sendProfileUpdateRequest(businessProfileUpdateRequest);
     return businessProfileUpdateRequest.getRequestId();

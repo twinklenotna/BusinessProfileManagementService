@@ -2,7 +2,6 @@ package com.example.BusinessProfileManagement.service;
 
 import com.example.BusinessProfileManagement.exception.BusinessProfileRequestException;
 import com.example.BusinessProfileManagement.exception.BusinessProfileRequestNotFoundException;
-import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
@@ -27,12 +26,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ProfileRequestService {
-  Logger logger = LoggerFactory.getLogger(ProfileRequestService.class);
+public class BusinessProfileRequestService {
+  Logger logger = LoggerFactory.getLogger(BusinessProfileRequestService.class);
   private  final BusinessProfileRequestRepository businessProfileRequestRepository;
   private  final BusinessProfileMapper businessProfileMapper;
   private  final BusinessProfileRequestMapper businessProfileRequestMapper;
-  private  final ProfileProductValidationService profileProductValidationService;
+  private  final BusinessProfileProductValidationService _businessProfileProductValidationService;
   private  final BusinessProfileRequestResponseMapper businessProfileRequestResponseMapper;
   private  final BusinessProfilePatchRequestMapper businessProfilePatchRequestMapper;
 
@@ -49,7 +48,7 @@ public class ProfileRequestService {
   public BusinessProfileRequestResponse getProfileUpdateRequest(String requestId) {
     BusinessProfileRequestEntity requestEntity = businessProfileRequestRepository.findByRequestId(requestId);
     List<BusinessProfileRequestProductValidation> businessProfileRequestProductValidations =
-        profileProductValidationService.getRequestProductValidations(requestId);
+        _businessProfileProductValidationService.getRequestProductValidations(requestId);
     if(requestEntity == null) {
       logger.error("Business profile request with id: " + requestId + " not found");
       throw new BusinessProfileRequestNotFoundException("Business profile request with id: " + requestId + " not found");

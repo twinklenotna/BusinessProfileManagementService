@@ -3,7 +3,7 @@ package com.example.BusinessProfileManagement.config;
 import com.example.BusinessProfileManagement.exception.BusinessProfileValidationClientException;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
-import com.example.BusinessProfileManagement.service.ProfileRequestService;
+import com.example.BusinessProfileManagement.service.BusinessProfileRequestService;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -36,17 +36,17 @@ class KafkaConsumerConfig {
   @Value(value = "${kafka.backoff.max_failure}")
   private Long maxAttempts;
 
-  private final ProfileRequestService profileRequestService;
+  private final BusinessProfileRequestService _businessProfileRequestService;
 
-  public KafkaConsumerConfig(ProfileRequestService profileRequestService) {
-    this.profileRequestService = profileRequestService;
+  public KafkaConsumerConfig(BusinessProfileRequestService businessProfileRequestService) {
+    this._businessProfileRequestService = businessProfileRequestService;
   }
 
   @Bean
-  public DefaultErrorHandler errorHandler(ProfileRequestService profileRequestService) {
+  public DefaultErrorHandler errorHandler(BusinessProfileRequestService businessProfileRequestService) {
     BackOff fixedBackOff = new FixedBackOff(interval, maxAttempts);
     DefaultErrorHandler errorHandler = new DefaultErrorHandler((consumerRecord, exception) -> {
-      profileRequestService.updateRequestStatus((BusinessProfileUpdateRequest) consumerRecord.value(), ApprovalStatus.FAILED);
+      businessProfileRequestService.updateRequestStatus((BusinessProfileUpdateRequest) consumerRecord.value(), ApprovalStatus.FAILED);
     }, fixedBackOff);
     errorHandler.addRetryableExceptions(BusinessProfileValidationClientException.class);
     errorHandler.addNotRetryableExceptions(NullPointerException.class);
@@ -73,7 +73,7 @@ class KafkaConsumerConfig {
   public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
     ConcurrentKafkaListenerContainerFactory<String, String> factory =
         new ConcurrentKafkaListenerContainerFactory<>();
-    factory.setCommonErrorHandler(errorHandler(profileRequestService));
+    factory.setCommonErrorHandler(errorHandler(_businessProfileRequestService));
     factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
     factory.setConsumerFactory(consumerFactory());
     return factory;

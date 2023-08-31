@@ -18,7 +18,7 @@ public class ProfileUpdateRequestProducer {
 
   private final KafkaTemplate<String, BusinessProfileUpdateRequest> kafkaTemplate;
   @Value("${kafka.topic}")
-  private String topicName;
+  public String topicName;
   @Autowired
   public ProfileUpdateRequestProducer(KafkaTemplate<String, BusinessProfileUpdateRequest> kafkaTemplate) {
     this.kafkaTemplate = kafkaTemplate;

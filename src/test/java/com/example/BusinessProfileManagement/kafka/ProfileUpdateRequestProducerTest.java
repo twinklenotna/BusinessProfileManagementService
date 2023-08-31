@@ -35,6 +35,7 @@ public class ProfileUpdateRequestProducerTest {
     request.setRequestId("testRequestId");
     request.setProfileId("testprofileId");
     String key = "testKey";
+    profileUpdateRequestProducer.topicName = "business-profile-update-requests";
 
     SendResult<String, BusinessProfileUpdateRequest> sendResult = new SendResult<>(null, null);
     CompletableFuture<SendResult<String, BusinessProfileUpdateRequest>> future = CompletableFuture.completedFuture(sendResult);
@@ -43,6 +44,6 @@ public class ProfileUpdateRequestProducerTest {
 
     profileUpdateRequestProducer.sendProfileUpdateRequestWithKey(key, request);
 
-    Mockito.verify(kafkaTemplate, Mockito.times(1)).send("profileRequest", key, request);
+    Mockito.verify(kafkaTemplate, Mockito.times(1)).send("business-profile-update-requests", key, request);
   }
 }

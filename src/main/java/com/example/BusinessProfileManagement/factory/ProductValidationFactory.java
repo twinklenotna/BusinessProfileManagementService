@@ -1,12 +1,11 @@
 package com.example.BusinessProfileManagement.factory;
 
 import com.example.BusinessProfileManagement.client.DefaultProductClient;
+import com.example.BusinessProfileManagement.client.ProductClient;
 import com.example.BusinessProfileManagement.client.QBOProductClient;
 import com.example.BusinessProfileManagement.config.ProductUrlMapConfig;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.stereotype.Service;
 
 
@@ -23,11 +22,11 @@ public class ProductValidationFactory {
     this.productUrlMapConfig = productUrlMapConfig;
   }
 
-  public BusinessProfileRequestProductValidation validateProfile(String productId, BusinessProfile request) {
+  public ProductClient getClient(String productId) {
     if(productId.equals(QUICKBOOKS)) {
-      return qboProductClient.getApproval(productId, request);
+      return qboProductClient;
     } else if (productUrlMapConfig.getUrl().containsKey(productId)) {
-      return defaultProductClient.getApproval(productId, request);
+      return defaultProductClient;
     } else {
       throw new IllegalArgumentException("Unknown product: " + productId);
     }

@@ -34,7 +34,7 @@ public class BusinessProfileServiceTest {
   private BusinessProfileRepository profileRepository;
 
   @Mock
-  private ProfileRequestService profileRequestService;
+  private BusinessProfileRequestService _businessProfileRequestService;
 
   @Mock
   private ProfileUpdateRequestProducer profileUpdateRequestProducer;
@@ -51,12 +51,12 @@ public class BusinessProfileServiceTest {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.UPDATE);
 
-    when(profileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>()))
+    when(_businessProfileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>()))
         .thenReturn(businessProfileUpdateRequest);
 
     businessProfileService.updateProfile(profile);
 
-    verify(profileRequestService, times(1)).createBusinessProfileRequest(any(), any(), any());
+    verify(_businessProfileRequestService, times(1)).createBusinessProfileRequest(any(), any(), any());
     verify(profileUpdateRequestProducer, times(1)).sendProfileUpdateRequestWithKey(any(), any());
   }
 
@@ -79,12 +79,12 @@ public class BusinessProfileServiceTest {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE);
 
-    when(profileRequestService.createBusinessProfileRequest(eq(profile), eq(RequestType.SUBSCRIBE), any()))
+    when(_businessProfileRequestService.createBusinessProfileRequest(eq(profile), eq(RequestType.SUBSCRIBE), any()))
         .thenReturn(businessProfileUpdateRequest);
 
     businessProfileService.updateProfile(profile, businessProfileUpdateRequest.getSubscriptions());
 
-    verify(profileRequestService, times(1)).createBusinessProfileRequest(eq(profile), eq(RequestType.SUBSCRIBE), any());
+    verify(_businessProfileRequestService, times(1)).createBusinessProfileRequest(eq(profile), eq(RequestType.SUBSCRIBE), any());
     verify(profileUpdateRequestProducer, times(1)).sendProfileUpdateRequestWithKey(any(), any());
   }
 

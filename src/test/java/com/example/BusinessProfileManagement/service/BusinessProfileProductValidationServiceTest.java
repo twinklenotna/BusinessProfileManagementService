@@ -14,18 +14,17 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class ProfileProductValidationServiceTest {
+public class BusinessProfileProductValidationServiceTest {
 
   @Mock
   private BusinessProfileRequestProductValidationRepository businessProfileRequestProductValidationRepository;
 
   @InjectMocks
-  private ProfileProductValidationService profileProductValidationService;
+  private BusinessProfileProductValidationService _businessProfileProductValidationService;
 
   @BeforeEach
   public void setUp() {
@@ -41,7 +40,7 @@ public class ProfileProductValidationServiceTest {
     entities.add(entity);
     when(businessProfileRequestProductValidationRepository.findByRequestId(requestId)).thenReturn(entities);
 
-    List<BusinessProfileRequestProductValidation> validations = profileProductValidationService.getRequestProductValidations(requestId);
+    List<BusinessProfileRequestProductValidation> validations = _businessProfileProductValidationService.getRequestProductValidations(requestId);
 
     assertEquals(1, validations.size());
     assertEquals(entity.getRequestId(), validations.get(0).getRequestId());
@@ -55,7 +54,7 @@ public class ProfileProductValidationServiceTest {
     BusinessProfileRequestProductValidationEntity entity = BusinessProfileRequestProductValidationMapper.INSTANCE.dtoToEntity(validation);
     when(businessProfileRequestProductValidationRepository.saveAndFlush(entity)).thenReturn(entity);
 
-    BusinessProfileRequestProductValidation savedValidation = profileProductValidationService.saveBusinessProfileRequestProductValidation(validation);
+    BusinessProfileRequestProductValidation savedValidation = _businessProfileProductValidationService.saveBusinessProfileRequestProductValidation(validation);
 
     assertEquals(validation.getRequestId(), savedValidation.getRequestId());
   }

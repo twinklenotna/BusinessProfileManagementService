@@ -1,5 +1,6 @@
 package com.example.BusinessProfileManagement.service;
 
+import com.example.BusinessProfileManagement.client.ProductClient;
 import com.example.BusinessProfileManagement.exception.BusinessProfileValidationException;
 import com.example.BusinessProfileManagement.factory.ProductValidationFactory;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
@@ -31,13 +32,14 @@ public class ProfileValidationService {
   private final ProductValidationFactory productValidationFactory;
   private final BusinessProfileService businessProfileService;
   private final ProfileSubscriptionService profileSubscriptionService;
-  private final ProfileProductValidationService profileProductValidationService;
+  private final BusinessProfileProductValidationService _businessProfileProductValidationService;
   private final BusinessProfilePatchMapper businessProfilePatchMapper;
 
 
   @Transactional
   public boolean validateRequest(BusinessProfileUpdateRequest request) {
     logger.debug("Started Validation for requestId: "+ request);
+    BusinessProfilePatchRequest businessProfilePatchRequest = request.getBusinessProfile();
     enrichRequest(request);
     Set<String> subscriptions = request.getSubscriptions();
     subscriptions.removeAll(getSuccessfulProductValidations(request.getRequestId()));
@@ -60,7 +62,6 @@ public class ProfileValidationService {
           task.join();
         }
       });
-
     } catch (CompletionException ex) {
       throw new BusinessProfileValidationException("Validation failed", ex);
     }
@@ -73,6 +74,7 @@ public class ProfileValidationService {
             request.getRequestId() + " with product: " + validation.getProductId());
       } else if (validation.getStatus().equals(ApprovalStatus.REJECTED)) {
         allApproved.set(false);
+        request.setBusinessProfile(businessProfilePatchRequest);
       }
     }
     logger.debug("Validation completed for requestId: "+ request+ " with status: "+ allApproved.get());
@@ -80,10 +82,9 @@ public class ProfileValidationService {
   }
 
 
-
   public Set<String> getSuccessfulProductValidations(String requestId) {
     List<BusinessProfileRequestProductValidation> allProductValidations =
-        profileProductValidationService.getRequestProductValidations(requestId);
+        _businessProfileProductValidationService.getRequestProductValidations(requestId);
     return allProductValidations.stream()
         .filter(validateRequest -> !validateRequest.getStatus().equals(ApprovalStatus.FAILED))
         .map(validateRequest -> validateRequest.getProductId())
@@ -99,15 +100,14 @@ public class ProfileValidationService {
 
   public CompletableFuture<BusinessProfileRequestProductValidation> validateRequest(String productId, BusinessProfile profile, String requestId) {
     return CompletableFuture.supplyAsync(() -> {
-      BusinessProfileRequestProductValidation validation = productValidationFactory
-          .validateProfile(productId, profile);
+      ProductClient client = productValidationFactory
+          .getClient(productId);
+      BusinessProfileRequestProductValidation validation = client.getApproval(productId, profile);
       validation.setRequestId(requestId);
-      profileProductValidationService.saveBusinessProfileRequestProductValidation(validation);
+      _businessProfileProductValidationService.saveBusinessProfileRequestProductValidation(validation);
       return validation;
     });
   }
-
-
 
   public BusinessProfile fetchBusinessProfileEntity(String profileId, BusinessProfilePatchRequest businessProfilePatchRequest) {
     BusinessProfile businessProfile = businessProfileService.getProfileById(profileId);

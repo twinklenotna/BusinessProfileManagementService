@@ -11,9 +11,8 @@ import com.example.BusinessProfileManagement.model.BusinessProfile;
 import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
+import com.example.BusinessProfileManagement.service.BusinessProfileRequestService;
 import com.example.BusinessProfileManagement.service.BusinessProfileService;
-import com.example.BusinessProfileManagement.service.ProfileRequestService;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,13 +23,13 @@ public class BusinessProfileControllerTest {
 
   private BusinessProfileController controller;
   private BusinessProfileService profileService;
-  private ProfileRequestService profileRequestService;
+  private BusinessProfileRequestService _businessProfileRequestService;
 
   @BeforeEach
   public void setUp() {
     profileService = mock(BusinessProfileService.class);
-    profileRequestService = mock(ProfileRequestService.class);
-    controller = new BusinessProfileController(profileService, profileRequestService);
+    _businessProfileRequestService = mock(BusinessProfileRequestService.class);
+    controller = new BusinessProfileController(profileService, _businessProfileRequestService);
   }
 
   @Test
@@ -115,7 +114,7 @@ public class BusinessProfileControllerTest {
     String profileId = "123";
     List<BusinessProfileUpdateRequest> requests = ProfileRequestHelper.createBusinessProfileRequests(3, profileId);
 
-    when(profileRequestService.getProfileUpdateRequestsByprofileId(profileId))
+    when(_businessProfileRequestService.getProfileUpdateRequestsByprofileId(profileId))
         .thenReturn(requests);
 
     ResponseEntity<List<BusinessProfileUpdateRequest>> response =
@@ -132,7 +131,7 @@ public class BusinessProfileControllerTest {
     BusinessProfileRequestResponse requestResponse = ProfileRequestHelper.createBusinessProfileRequestResponse(profileId);
     requestResponse.setRequestId(requestId);
 
-    when(profileRequestService.getProfileUpdateRequest(requestId))
+    when(_businessProfileRequestService.getProfileUpdateRequest(requestId))
         .thenReturn(requestResponse);
 
     ResponseEntity<BusinessProfileRequestResponse> response =
@@ -154,7 +153,7 @@ public class BusinessProfileControllerTest {
     String profileId = "123";
     String requestId = "456";
 
-    when(profileRequestService.getProfileUpdateRequest(requestId))
+    when(_businessProfileRequestService.getProfileUpdateRequest(requestId))
         .thenThrow(new BusinessProfileRequestNotFoundException("request not found"));
 
     ResponseEntity<BusinessProfileRequestResponse> response =

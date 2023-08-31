@@ -36,14 +36,16 @@ public class BusinessProfileControllerTest {
   public void testUpdateProfile() {
     String profileId = "testprofileId";
     BusinessProfilePatchRequest profile = ProfileHelper.createBusinessProfilePatchRequest(profileId);
+    BusinessProfileUpdateRequest profileRequest = ProfileRequestHelper.createBusinessProfileRequest(profileId);
+    profileRequest.setRequestId("testRequestId");
     profile.setProfileId(profileId);
 
-    when(profileService.updateProfile(profile)).thenReturn("testRequestId");
+    when(profileService.updateProfile(profile)).thenReturn(profileRequest);
 
-    ResponseEntity<String> response = controller.updateProfile(profileId, profile);
+    ResponseEntity<BusinessProfileUpdateRequest> response = controller.updateProfile(profileId, profile);
 
     assertEquals(202, response.getStatusCodeValue());
-    assertEquals("testRequestId", response.getBody());
+    assertEquals("testRequestId", response.getBody().getRequestId());
   }
 
   @Test

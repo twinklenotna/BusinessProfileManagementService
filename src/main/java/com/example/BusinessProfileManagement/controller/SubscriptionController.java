@@ -22,9 +22,9 @@ public class SubscriptionController {
   }
 
   @PostMapping("/subscribe")
-  public ResponseEntity<String> subscribe(@RequestBody ProfileSubscription profileSubscription) {
+  public ResponseEntity<Void> subscribe(@RequestBody ProfileSubscription profileSubscription) {
     profileSubscriptionService.subscribe(profileSubscription);
-    return ResponseEntity.accepted().body("Profile subscription request accepted.");
+    return ResponseEntity.accepted().build();
   }
 
   @GetMapping("/{profileId}")

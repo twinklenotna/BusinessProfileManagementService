@@ -38,12 +38,12 @@ public class BusinessProfileService {
    * @param profile Profile object containing the fields to be changed
    */
   @Transactional
-  public String updateProfile(BusinessProfilePatchRequest profile) {
+  public BusinessProfileUpdateRequest updateProfile(BusinessProfilePatchRequest profile) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
         _businessProfileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>());
     logger.info("created profile request with id: " + businessProfileUpdateRequest.getRequestId());
     sendProfileUpdateRequest(businessProfileUpdateRequest);
-    return businessProfileUpdateRequest.getRequestId();
+    return businessProfileUpdateRequest;
   }
 
   /**

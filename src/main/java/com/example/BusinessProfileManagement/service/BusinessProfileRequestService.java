@@ -61,6 +61,7 @@ public class BusinessProfileRequestService {
     try {
       request.setStatus(status);
       updateBusinessProfileRequestEntity(request);
+      logger.info("Profile request: {} is updated with status: {}",request.getRequestId(),request.getStatus());
     } catch(Exception ex) {
       logger.error("Error happened while updating request with requestId: "+request.getRequestId()+" " +ex.getMessage());
       throw new BusinessProfileRequestException(
@@ -79,6 +80,7 @@ public class BusinessProfileRequestService {
     requestEntity.setRequestType(requestType);
     requestEntity.setSubscriptions(subscriptions);
     try{
+      logger.info("Creating Profile request: {} with status: {}",requestEntity.getRequestId(),requestEntity.getStatus());
        return businessProfileRequestMapper.entityToDto(businessProfileRequestRepository.saveAndUpdate(requestEntity));
     } catch(Exception ex) {
       logger.error("Error happened while creating request with requestId for profileId: "+ profile.getProfileId() + " " +ex.getMessage());

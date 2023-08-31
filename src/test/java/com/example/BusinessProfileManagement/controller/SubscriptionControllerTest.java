@@ -26,10 +26,9 @@ public class SubscriptionControllerTest {
   public void testSubscribe() {
     ProfileSubscription profileSubscription = new ProfileSubscription();
 
-    ResponseEntity<String> response = controller.subscribe(profileSubscription);
+    ResponseEntity<Void> response = controller.subscribe(profileSubscription);
 
     assertEquals(202, response.getStatusCode().value());
-    assertEquals("Profile subscription request accepted.", response.getBody());
 
     verify(profileSubscriptionService, times(1)).subscribe(profileSubscription);
   }

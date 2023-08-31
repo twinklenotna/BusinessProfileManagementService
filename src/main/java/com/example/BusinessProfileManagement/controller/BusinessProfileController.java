@@ -33,15 +33,15 @@ public class BusinessProfileController {
   @PostMapping
   public ResponseEntity<BusinessProfile> createProfile(@RequestBody BusinessProfile profile) {
     BusinessProfile profileCreated = profileService.createProfileRequest(profile);
-    return ResponseEntity.created(URI.create("/profiles/" + profileCreated.getProfileId()))
+    return ResponseEntity.created(URI.create("/profile/" + profileCreated.getProfileId()))
             .body(profileCreated);
   }
 
   @PatchMapping("/{profileId}")
-  public ResponseEntity<String> updateProfile(@PathVariable String profileId, @RequestBody BusinessProfilePatchRequest profile) {
+  public ResponseEntity<BusinessProfileUpdateRequest> updateProfile(@PathVariable String profileId, @RequestBody BusinessProfilePatchRequest profile) {
     profile.setProfileId(profileId);
-    String requestId = profileService.updateProfile(profile);
-    return ResponseEntity.accepted().body(requestId);
+    BusinessProfileUpdateRequest request = profileService.updateProfile(profile);
+    return ResponseEntity.accepted().body(request);
   }
 
   @GetMapping("/{profileId}")

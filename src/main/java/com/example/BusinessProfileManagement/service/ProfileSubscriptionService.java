@@ -48,6 +48,7 @@ public class ProfileSubscriptionService {
     } catch(NullPointerException ex) {
       logger.warn("No subscriptions found for profileId: "+ profileId);
     } finally {
+      logger.info("Adding subscription for profile: {} ", profileId);
       return profileSubscriptionRepository.save(profileSubscriptionEntity).getSubscriptions();
     }
   }

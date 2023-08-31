@@ -151,12 +151,12 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<exclude>com.example.BusinessProfileManagement.client.*</exclude>
-								<exclude>com.example.BusinessProfileManagement.config.*</exclude>
-								<exclude>com.example.BusinessProfileManagement.factory.*</exclude>
-								<exclude>com.example.BusinessProfileManagement.model.mapper.*</exclude>
-								<exclude>com.example.BusinessProfileManagement.exception.*</exclude>
-								<exclude>com.example.BusinessProfileManagement.BusinessProfileManagementApplication.class</exclude>
+								<exclude>**/client/**</exclude>
+								<exclude>**/config/**</exclude>
+								<exclude>**/factory/**</exclude>
+								<exclude>**/model/**</exclude>
+								<exclude>**/exception/**</exclude>
+								<exclude>**/BusinessProfileManagementApplication/**</exclude>
 							</excludes>
 							<rules>
 								<rule>
@@ -165,7 +165,7 @@
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.60</minimum>
+											<minimum>0.90</minimum>
 										</limit>
 									</limits>
 								</rule>

@@ -86,7 +86,8 @@ public class BusinessProfileService {
 //    BusinessProfileUpdateRequest businessProfileUpdateRequest =
 //        profileRequestService.createBusinessProfileRequest(profile, RequestType.CREATE, new HashSet<>());
 //    sendProfileUpdateRequest(businessProfileUpdateRequest);
-    return businessProfileMapper.toDto(businessProfileEntity);
+    BusinessProfile businessProfile = businessProfileMapper.toDto(businessProfileEntity);
+    return businessProfile;
   }
 
   /**
@@ -115,7 +116,8 @@ public class BusinessProfileService {
       log.warn("Business profile with id: " + profileId + " not found");
       throw new BusinessProfileNotFoundException("Business profile with id: " + profileId + " not found");
     }
-    return businessProfileMapper.toDto(profileEntity);
+    BusinessProfile businessProfile = businessProfileMapper.toDto(profileEntity);
+    return businessProfile;
   }
 
   /**

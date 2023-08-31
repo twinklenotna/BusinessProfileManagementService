@@ -51,18 +51,18 @@ public class ProfileSubscriptionService {
    */
   @CachePut(value = "subscriptions", key = "#profileId")
   public Set<String>  addSubscriptions(String profileId, Set<String> subscriptions) {
-    ProfileSubscriptionEntity profileSubscriptionEntity = new ProfileSubscriptionEntity(profileId, new HashSet<>());
+    ProfileSubscriptionEntity profileSubscriptionEntity = new ProfileSubscriptionEntity(profileId, new HashSet<>(subscriptions));
     try{
       ProfileSubscriptionEntity profileSubscriptions= profileSubscriptionRepository.getProfileById(profileId);
       if(profileSubscriptions != null) {
-        profileSubscriptions.getSubscriptions().addAll(subscriptions);
-        profileSubscriptionEntity = profileSubscriptions;
+        profileSubscriptionEntity.getSubscriptions().addAll(profileSubscriptions.getSubscriptions());
       }
     } catch(NullPointerException ex) {
       log.warn("No subscriptions found for profileId: "+ profileId);
     } finally {
       log.info("Adding subscription for profile: {} ", profileId);
-      return profileSubscriptionRepository.save(profileSubscriptionEntity).getSubscriptions();
+      subscriptions = profileSubscriptionRepository.save(profileSubscriptionEntity).getSubscriptions();
     }
+    return subscriptions;
   }
 }

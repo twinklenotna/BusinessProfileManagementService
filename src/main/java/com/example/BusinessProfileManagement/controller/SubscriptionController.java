@@ -21,7 +21,7 @@ public class SubscriptionController {
     this.profileSubscriptionService = _profileSubscriptionService;
   }
 
-  @PostMapping("/subscribe")
+  @PostMapping
   public ResponseEntity<Void> subscribe(@RequestBody ProfileSubscription profileSubscription) {
     profileSubscriptionService.subscribe(profileSubscription);
     return ResponseEntity.accepted().build();

@@ -81,12 +81,15 @@ public class ProfileSubscriptionServiceTest {
     profileSubscriptionEntity.setSubscriptions(new HashSet<>(Arrays.asList("existingProduct")));
     profileSubscriptionEntity.setProfileId(profileId);
 
+    ProfileSubscriptionEntity profileSubscriptionEntityUpdated = new ProfileSubscriptionEntity();
+    profileSubscriptionEntityUpdated.setSubscriptions(new HashSet<>(Arrays.asList("existingProduct")));
+    profileSubscriptionEntityUpdated.setProfileId(profileId);
+    profileSubscriptionEntityUpdated.getSubscriptions().addAll(subscriptions);
+
     when(profileSubscriptionRepository.getProfileById(profileId)).thenReturn(profileSubscriptionEntity);
-    when(profileSubscriptionRepository.save(any())).thenReturn(profileSubscriptionEntity);
+    when(profileSubscriptionRepository.save(any())).thenReturn(profileSubscriptionEntityUpdated);
 
-    profileSubscriptionService.addSubscriptions(profileId, subscriptions);
-
-    Set<String> updatedSubscriptions = profileSubscriptionEntity.getSubscriptions();
+    Set<String> updatedSubscriptions = profileSubscriptionService.addSubscriptions(profileId, subscriptions);
     assertTrue(updatedSubscriptions.containsAll(subscriptions));
   }
 

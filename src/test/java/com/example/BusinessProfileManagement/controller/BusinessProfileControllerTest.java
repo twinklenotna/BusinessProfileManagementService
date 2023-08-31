@@ -59,7 +59,7 @@ public class BusinessProfileControllerTest {
 
     assertEquals(201, response.getStatusCodeValue());
     assertTrue(response.getHeaders().containsKey("Location"));
-    assertEquals("/profiles/testprofileId", response.getHeaders().get("Location").get(0));
+    assertEquals("/profile/testprofileId", response.getHeaders().get("Location").get(0));
     assertEquals("testprofileId", response.getBody().getProfileId());
   }
 

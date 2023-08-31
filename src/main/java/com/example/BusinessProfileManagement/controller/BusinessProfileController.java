@@ -30,6 +30,11 @@ public class BusinessProfileController {
   private final BusinessProfileService profileService;
   private final BusinessProfileRequestService businessProfileRequestService;
 
+  /**
+   * To create a new BusinessProfile
+   * @param profile profile object
+   * @return BusinessProfile object
+   */
   @PostMapping
   public ResponseEntity<BusinessProfile> createProfile(@RequestBody BusinessProfile profile) {
     BusinessProfile profileCreated = profileService.createProfileRequest(profile);
@@ -37,6 +42,12 @@ public class BusinessProfileController {
             .body(profileCreated);
   }
 
+  /**
+   * To update the BusinessProfile
+   * @param profileId profileId
+   * @param profile Profile object containing the fields to be changed
+   * @return BusinessProfile object
+   */
   @PatchMapping("/{profileId}")
   public ResponseEntity<BusinessProfileUpdateRequest> updateProfile(@PathVariable String profileId, @RequestBody BusinessProfilePatchRequest profile) {
     profile.setProfileId(profileId);
@@ -44,6 +55,11 @@ public class BusinessProfileController {
     return ResponseEntity.accepted().body(request);
   }
 
+  /**
+   * To get the BusinessProfile by profileId
+   * @param profileId profileId
+   * @return BusinessProfile object
+   */
   @GetMapping("/{profileId}")
   public ResponseEntity<BusinessProfile> getProfile(@PathVariable String profileId) {
     try{
@@ -54,6 +70,11 @@ public class BusinessProfileController {
     }
   }
 
+  /**
+   * To delete the BusinessProfile by profileId
+   * @param profileId profileId
+   * @return BusinessProfile object
+   */
   @DeleteMapping("/{profileId}")
   public ResponseEntity<Void> deleteProfile(@PathVariable String profileId) {
     try {
@@ -64,12 +85,24 @@ public class BusinessProfileController {
     }
   }
 
+
+  /**
+   * To get the profile update requests by profileId
+   * @param profileId profileId
+   * @return List of profile update requests
+   */
   @GetMapping("/{profileId}/requests")
   public ResponseEntity<List<BusinessProfileUpdateRequest>> getProfileUpdateRequests(@PathVariable String profileId) {
     List<BusinessProfileUpdateRequest> requests = businessProfileRequestService.getProfileUpdateRequestsByprofileId(profileId);
     return ResponseEntity.ok(requests);
   }
 
+  /**
+   * To get the profile update request by requestId
+   * @param profileId profileId
+   * @param requestId requestId
+   * @return profile update request
+   */
   @GetMapping("/{profileId}/requests/{requestId}")
   public ResponseEntity<BusinessProfileRequestResponse> getProfileUpdateRequests(@PathVariable String profileId, @PathVariable String requestId) {
     try{

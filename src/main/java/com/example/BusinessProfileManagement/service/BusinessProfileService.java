@@ -16,6 +16,9 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,18 +63,20 @@ public class BusinessProfileService {
    * @return profileId
    */
   @Transactional
-  public String createProfileRequest(BusinessProfile profile) {
+  @CachePut(value = "businessProfiles", key = "#profile.profileId")
+  public BusinessProfile createProfileRequest(BusinessProfile profile) {
     BusinessProfileEntity businessProfileEntity = createBusinessProfileEntity(profile);
-    BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        profileRequestService.createBusinessProfileRequest(profile, RequestType.CREATE, new HashSet<>());
-    sendProfileUpdateRequest(businessProfileUpdateRequest);
-    return businessProfileEntity.getProfileId();
+//    BusinessProfileUpdateRequest businessProfileUpdateRequest =
+//        profileRequestService.createBusinessProfileRequest(profile, RequestType.CREATE, new HashSet<>());
+//    sendProfileUpdateRequest(businessProfileUpdateRequest);
+    return businessProfileMapper.toDto(businessProfileEntity);
   }
 
   /**
    * Delete businessProfile associated with given profileId
    * @param profileId profileID of the businessProfile
    */
+  @CacheEvict(value = "businessProfiles", key = "#profileId")
   public void deleteProfile(String profileId) {
     try {
       profileRepository.delete(profileId);
@@ -86,6 +91,7 @@ public class BusinessProfileService {
    * @param profileId id of the business Profile
    * @return businessProfile Object
    */
+  @Cacheable(value = "businessProfiles", key = "#profileId")
   public BusinessProfile getProfileById(String profileId) {
     BusinessProfileEntity profileEntity = profileRepository.getProfileById(profileId);
     if(profileEntity == null) {
@@ -111,6 +117,7 @@ public class BusinessProfileService {
    * @param profile profileObject
    * @return profile Entity
    */
+  @CachePut(value = "businessProfiles", key = "#profile.profileId")
   public BusinessProfileEntity updateBusinessProfileEntity(BusinessProfile profile) {
     BusinessProfileEntity profileEntity = businessProfileMapper.toEntity(profile);
     profileEntity.setStatus(ProfileStatus.ACTIVE);

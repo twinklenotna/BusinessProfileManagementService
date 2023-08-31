@@ -32,7 +32,7 @@ public class BusinessProfileController {
 
   @PostMapping
   public ResponseEntity<String> createProfile(@RequestBody BusinessProfile profile) {
-    String profileId = profileService.createProfileRequest(profile);
+    String profileId = profileService.createProfileRequest(profile).getProfileId();
     return ResponseEntity.created(URI.create("/profiles/" + profileId))
             .body(profileId);
   }

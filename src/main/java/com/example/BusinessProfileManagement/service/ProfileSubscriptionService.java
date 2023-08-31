@@ -10,6 +10,8 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +26,7 @@ public class ProfileSubscriptionService {
     businessProfileService.updateProfile(businessProfile, profileSubscription.getSubscriptions());
   }
 
+  @Cacheable(value = "subscriptions", key = "#profileId")
   public Set<String> getSubscriptions(String profileId) {
     try{
       ProfileSubscriptionEntity profileSubscriptionEntity = profileSubscriptionRepository.getProfileById(profileId);
@@ -33,8 +36,8 @@ public class ProfileSubscriptionService {
       return new HashSet<>();
     }
   }
-
-  public void addSubscriptions(String profileId, Set<String> subscriptions) {
+  @CachePut(value = "subscriptions", key = "#profileId")
+  public Set<String>  addSubscriptions(String profileId, Set<String> subscriptions) {
     ProfileSubscriptionEntity profileSubscriptionEntity = new ProfileSubscriptionEntity(profileId, new HashSet<>());
     try{
       ProfileSubscriptionEntity profileSubscriptions= profileSubscriptionRepository.getProfileById(profileId);
@@ -45,7 +48,7 @@ public class ProfileSubscriptionService {
     } catch(NullPointerException ex) {
       logger.warn("No subscriptions found for profileId: "+ profileId);
     } finally {
-      profileSubscriptionRepository.save(profileSubscriptionEntity);
+      return profileSubscriptionRepository.save(profileSubscriptionEntity).getSubscriptions();
     }
   }
 }

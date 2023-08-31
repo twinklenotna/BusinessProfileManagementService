@@ -16,6 +16,9 @@ class KafkaTopicConfig {
   @Value(value = "${spring.kafka.bootstrap-servers}")
   private String bootstrapAddress;
 
+  @Value(value = "${kafka.topic}")
+  private String topic;
+
   @Bean
   public KafkaAdmin kafkaAdmin() {
     Map<String, Object> configs = new HashMap<>();
@@ -25,6 +28,6 @@ class KafkaTopicConfig {
 
   @Bean
   public NewTopic profileRequest() {
-    return TopicBuilder.name("profileRequest").partitions(10).build();
+    return TopicBuilder.name(topic).partitions(10).build();
   }
 }

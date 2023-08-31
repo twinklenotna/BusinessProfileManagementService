@@ -26,7 +26,7 @@ public class BusinessProfileRequestContext {
 
   @Transactional
   public void processRequest(BusinessProfileUpdateRequest request) {
-      currentState = inProgressState;
+    currentState = inProgressState;
     currentState.processRequest(request, this);
   }
 

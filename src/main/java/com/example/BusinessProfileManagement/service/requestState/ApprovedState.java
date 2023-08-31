@@ -4,33 +4,29 @@ import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.ProfileSubscription;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
+import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchMapper;
 import com.example.BusinessProfileManagement.service.BusinessProfileService;
 import com.example.BusinessProfileManagement.service.ProfileRequestService;
 import com.example.BusinessProfileManagement.service.ProfileSubscriptionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class ApprovedState implements ConsumerState {
-  final BusinessProfileService _businessProfileService;
-  final ProfileRequestService _profileRequestService;
-  final ProfileSubscriptionService _profileSubscriptionService;
-
-  public ApprovedState(BusinessProfileService _businessProfileService, ProfileRequestService _profileRequestService,
-      ProfileSubscriptionService _profileSubscriptionService) {
-    this._businessProfileService = _businessProfileService;
-    this._profileRequestService = _profileRequestService;
-    this._profileSubscriptionService = _profileSubscriptionService;
-  }
-
+  private final BusinessProfileService businessProfileService;
+  private final ProfileRequestService profileRequestService;
+  private final ProfileSubscriptionService profileSubscriptionService;
+  private final BusinessProfilePatchMapper businessProfilePatchMapper;
   @Override
   public void processRequest(BusinessProfileUpdateRequest request,
                              BusinessProfileRequestContext businessProfileRequestContext) {
     request.setStatus(ApprovalStatus.APPROVED);
-    _profileRequestService.updateBusinessProfileRequestEntity(request);
-    _businessProfileService.updateBusinessProfileEntity(request.getBusinessProfile());
+    profileRequestService.updateBusinessProfileRequestEntity(request);
+    businessProfileService.updateBusinessProfileEntity(businessProfilePatchMapper.toProfile(request.getBusinessProfile()));
     if(request.getRequestType().equals(RequestType.SUBSCRIBE)) {
-      _profileSubscriptionService.addSubscriptions(request.getProfileId(), request.getSubscriptions());
+      profileSubscriptionService.addSubscriptions(request.getProfileId(), request.getSubscriptions());
     }
   }
 }

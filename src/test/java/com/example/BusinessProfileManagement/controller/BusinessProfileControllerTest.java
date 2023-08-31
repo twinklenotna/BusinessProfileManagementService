@@ -8,6 +8,7 @@ import com.example.BusinessProfileManagement.exception.BusinessProfileRequestNot
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.service.BusinessProfileService;
@@ -34,8 +35,8 @@ public class BusinessProfileControllerTest {
 
   @Test
   public void testUpdateProfile() {
-    String profileId = "testProfileId";
-    BusinessProfile profile = new BusinessProfile();
+    String profileId = "testprofileId";
+    BusinessProfilePatchRequest profile = ProfileHelper.createBusinessProfilePatchRequest(profileId);
     profile.setProfileId(profileId);
 
     when(profileService.updateProfile(profile)).thenReturn("testRequestId");
@@ -48,22 +49,22 @@ public class BusinessProfileControllerTest {
 
   @Test
   public void testCreateProfile() {
-    String profileId = "testProfileId";
+    String profileId = "testprofileId";
     BusinessProfile profile = ProfileHelper.createBusinessProfile(profileId);
 
     when(profileService.createProfileRequest(profile)).thenReturn(profile);
 
-    ResponseEntity<String> response = controller.createProfile(profile);
+    ResponseEntity<BusinessProfile> response = controller.createProfile(profile);
 
     assertEquals(201, response.getStatusCodeValue());
     assertTrue(response.getHeaders().containsKey("Location"));
-    assertEquals("/profiles/testProfileId", response.getHeaders().get("Location").get(0));
-    assertEquals("testProfileId", response.getBody());
+    assertEquals("/profiles/testprofileId", response.getHeaders().get("Location").get(0));
+    assertEquals("testprofileId", response.getBody().getProfileId());
   }
 
   @Test
   public void testGetProfile() {
-    String profileId = "testProfileId";
+    String profileId = "testprofileId";
     BusinessProfile profile = new BusinessProfile();
     profile.setProfileId(profileId);
 
@@ -77,7 +78,7 @@ public class BusinessProfileControllerTest {
 
   @Test
   public void testGetProfileNotFound() {
-    String profileId = "nonExistentProfileId";
+    String profileId = "nonExistentprofileId";
 
     when(profileService.getProfileById(profileId)).thenThrow(new BusinessProfileNotFoundException("exception"));
 
@@ -89,7 +90,7 @@ public class BusinessProfileControllerTest {
 
   @Test
   public void testDeleteProfile() {
-    String profileId = "testProfileId";
+    String profileId = "testprofileId";
 
     ResponseEntity<Void> response = controller.deleteProfile(profileId);
 
@@ -98,7 +99,7 @@ public class BusinessProfileControllerTest {
 
   @Test
   public void testDeleteProfileNotFound() {
-    String profileId = "nonExistentProfileId";
+    String profileId = "nonExistentprofileId";
     doThrow(new BusinessProfileNotFoundException("profile not found"))
         .when(profileService)
         .deleteProfile(profileId);
@@ -114,7 +115,7 @@ public class BusinessProfileControllerTest {
     String profileId = "123";
     List<BusinessProfileUpdateRequest> requests = ProfileRequestHelper.createBusinessProfileRequests(3, profileId);
 
-    when(profileRequestService.getProfileUpdateRequestsByProfileId(profileId))
+    when(profileRequestService.getProfileUpdateRequestsByprofileId(profileId))
         .thenReturn(requests);
 
     ResponseEntity<List<BusinessProfileUpdateRequest>> response =

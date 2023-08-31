@@ -6,6 +6,7 @@ import com.example.BusinessProfileManagement.helper.ProductValidationHelper;
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
@@ -13,6 +14,7 @@ import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequest
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileMapper;
+import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchRequestMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestResponseMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestRepository;
@@ -50,6 +52,9 @@ public class ProfileRequestServiceTest {
   @Mock
   BusinessProfileMapper _businessProfileMapper;
 
+  @Mock
+  BusinessProfilePatchRequestMapper _businessProfilePatchRequestMapper;
+
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -57,15 +62,15 @@ public class ProfileRequestServiceTest {
 
 
   @Test
-  public void testGetProfileRequestByProfileId() {
+  public void testGetProfileRequestByprofileId() {
 
-    when(businessProfileRequestRepository.findByProfileId(PROFILE_ID))
+    when(businessProfileRequestRepository.findByprofileId(PROFILE_ID))
         .thenReturn(ProfileRequestHelper.createBusinessProfileEntityRequests(3, PROFILE_ID));
     when(_businessProfileRequestMapper.entityToDto(any(BusinessProfileRequestEntity.class)))
         .thenReturn(ProfileRequestHelper
-            .createBusinessProfileRequest(ProfileHelper.createBusinessProfile(PROFILE_ID), RequestType.CREATE));
+            .createBusinessProfileRequest(ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID), RequestType.CREATE));
 
-    List<BusinessProfileUpdateRequest> requests = profileRequestService.getProfileUpdateRequestsByProfileId(PROFILE_ID);
+    List<BusinessProfileUpdateRequest> requests = profileRequestService.getProfileUpdateRequestsByprofileId(PROFILE_ID);
 
     assertNotNull(requests);
     assertEquals(requests.size(), 3);
@@ -103,8 +108,9 @@ public class ProfileRequestServiceTest {
 
   @Test
   public void testUpdateRequestStatus() {
-    BusinessProfile businessProfile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-    BusinessProfileUpdateRequest request = ProfileRequestHelper.createBusinessProfileRequest(businessProfile, RequestType.UPDATE);
+    BusinessProfilePatchRequest businessProfile = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
+    BusinessProfileUpdateRequest request = ProfileRequestHelper
+        .createBusinessProfileRequest(businessProfile, RequestType.UPDATE);
     BusinessProfileRequestEntity businessProfileRequestEntity =
         ProfileRequestHelper.createBusinessProfileRequestEntity(ProfileHelper.createBusinessProfileEntity(PROFILE_ID), RequestType.UPDATE);
     businessProfileRequestEntity.setStatus(ApprovalStatus.APPROVED);
@@ -119,8 +125,9 @@ public class ProfileRequestServiceTest {
 
   @Test
   public void testUpdateRequestStatusException() {
-    BusinessProfile businessProfile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-    BusinessProfileUpdateRequest request = ProfileRequestHelper.createBusinessProfileRequest(businessProfile, RequestType.UPDATE);
+    BusinessProfilePatchRequest businessProfile = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
+    BusinessProfileUpdateRequest request = ProfileRequestHelper
+        .createBusinessProfileRequest(businessProfile, RequestType.UPDATE);
 
     when(businessProfileRequestRepository.saveAndUpdate(any())).thenThrow(new RuntimeException("exception while saving"));
 
@@ -132,14 +139,14 @@ public class ProfileRequestServiceTest {
 
   @Test
   public void testCreateBusinessProfileRequest() {
-    BusinessProfile businessProfile = ProfileHelper.createBusinessProfile(PROFILE_ID);
+    BusinessProfilePatchRequest businessProfile = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
     BusinessProfileEntity businessProfileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
     BusinessProfileUpdateRequest request = ProfileRequestHelper.createBusinessProfileRequest(businessProfile, RequestType.UPDATE);
     BusinessProfileRequestEntity businessProfileRequestEntity =
         ProfileRequestHelper.createBusinessProfileRequestEntity(ProfileHelper.createBusinessProfileEntity(PROFILE_ID), RequestType.UPDATE);
 
     when(businessProfileRequestRepository.saveAndUpdate(any())).thenReturn(businessProfileRequestEntity);
-    when(_businessProfileMapper.toEntity(businessProfile)).thenReturn(businessProfileEntity);
+    when(_businessProfilePatchRequestMapper.toEntity(businessProfile)).thenReturn(businessProfileEntity);
     when(_businessProfileRequestMapper.entityToDto(businessProfileRequestEntity)).thenReturn(request);
 
     profileRequestService.createBusinessProfileRequest(businessProfile, RequestType.UPDATE, request.getSubscriptions());

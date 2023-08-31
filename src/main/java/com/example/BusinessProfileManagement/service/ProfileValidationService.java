@@ -3,9 +3,11 @@ package com.example.BusinessProfileManagement.service;
 import com.example.BusinessProfileManagement.exception.BusinessProfileValidationException;
 import com.example.BusinessProfileManagement.factory.ProductValidationFactory;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
+import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestProductValidationRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -25,12 +27,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProfileValidationService {
   Logger logger = LoggerFactory.getLogger(ProfileValidationService.class);
-  final BusinessProfileRequestProductValidationRepository _businessProfileRequestProductValidationRepository;
+  final BusinessProfileRequestProductValidationRepository businessProfileRequestProductValidationRepository;
   private final ProductValidationFactory productValidationFactory;
-  private final BusinessProfileService _businessProfileService;
-  private final ProfileSubscriptionService _profileSubscriptionService;
-  private final ProfileRequestService profileRequestService;
+  private final BusinessProfileService businessProfileService;
+  private final ProfileSubscriptionService profileSubscriptionService;
   private final ProfileProductValidationService profileProductValidationService;
+  private final BusinessProfilePatchMapper businessProfilePatchMapper;
 
 
   @Transactional
@@ -43,7 +45,8 @@ public class ProfileValidationService {
 
     for (String product : subscriptions) {
       // Start a validation task for each product
-      CompletableFuture<BusinessProfileRequestProductValidation> validationTask = validateRequest(product, request.getBusinessProfile(),
+      CompletableFuture<BusinessProfileRequestProductValidation> validationTask =
+          validateRequest(product, businessProfilePatchMapper.toProfile(request.getBusinessProfile()),
           request.getRequestId());
       validationTasks.add(validationTask);
     }
@@ -90,7 +93,7 @@ public class ProfileValidationService {
 
   private void enrichRequest(BusinessProfileUpdateRequest request) {
     BusinessProfile businessProfile = fetchBusinessProfileEntity(request.getProfileId(), request.getBusinessProfile());
-    request.setBusinessProfile(businessProfile);
+    request.setBusinessProfile(businessProfilePatchMapper.toPatchRequest(businessProfile));
     fetchSubscriptions(request);
   }
 
@@ -106,15 +109,15 @@ public class ProfileValidationService {
 
 
 
-  public BusinessProfile fetchBusinessProfileEntity(String profileId, BusinessProfile businessProfilePatchRequest) {
-    BusinessProfile businessProfile = _businessProfileService.getProfileById(profileId);
+  public BusinessProfile fetchBusinessProfileEntity(String profileId, BusinessProfilePatchRequest businessProfilePatchRequest) {
+    BusinessProfile businessProfile = businessProfileService.getProfileById(profileId);
     businessProfile.applyPatch(businessProfilePatchRequest);
     return businessProfile;
   }
 
   public void fetchSubscriptions(BusinessProfileUpdateRequest request) {
     if(request.getSubscriptions().size() == 0) {
-      request.setSubscriptions(_profileSubscriptionService.getSubscriptions(request.getProfileId()));
+      request.setSubscriptions(profileSubscriptionService.getSubscriptions(request.getProfileId()));
     }
   }
 }

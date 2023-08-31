@@ -6,6 +6,7 @@ import com.example.BusinessProfileManagement.helper.ProductValidationHelper;
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestProductValidation;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
@@ -13,6 +14,8 @@ import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequest
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequestProductValidationEntity;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
+import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchMapper;
+import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchRequestMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRequestProductValidationRepository;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,6 +53,11 @@ public class ProfileValidationServiceTest {
   @Mock
   private ProfileProductValidationService _profileProductValidationService;
 
+  @Mock
+  private BusinessProfilePatchRequestMapper _businessProfilePatchRequestMapper;
+  @Mock
+  BusinessProfilePatchMapper _businessProfilePatchMapper;
+
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -57,10 +65,11 @@ public class ProfileValidationServiceTest {
 
   @Test
   public void testApproveRequest_AllProductsApproved() {
+    BusinessProfilePatchRequest profilePatch = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
     BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.CREATE);
+        ProfileRequestHelper.createBusinessProfileRequest(profilePatch, RequestType.CREATE);
     BusinessProfileRequestEntity businessProfileRequestEntity =
         ProfileRequestHelper.createBusinessProfileRequestEntity(profileEntity, RequestType.CREATE, ApprovalStatus.APPROVED);
     businessProfileRequestEntity.setRequestId(businessProfileUpdateRequest.getRequestId());
@@ -85,6 +94,7 @@ public class ProfileValidationServiceTest {
         .thenReturn(businessProfileRequestProductValidations);
     when(_profileProductValidationService.saveBusinessProfileRequestProductValidation(any()))
         .thenReturn(businessProfileRequestProductValidations.get(0));
+    when(_businessProfilePatchMapper.toPatchRequest(any())).thenReturn(profilePatch);
 
 
     boolean requestValidated = profileValidationService.validateRequest(businessProfileUpdateRequest);
@@ -95,10 +105,11 @@ public class ProfileValidationServiceTest {
 
   @Test
   public void testApproveRequest_SomeProductsRejected() {
+    BusinessProfilePatchRequest profilePatch = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
     BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.CREATE);
+        ProfileRequestHelper.createBusinessProfileRequest(profilePatch, RequestType.CREATE);
     BusinessProfileRequestEntity businessProfileRequestEntity =
         ProfileRequestHelper.createBusinessProfileRequestEntity(profileEntity, RequestType.CREATE, ApprovalStatus.APPROVED);
     businessProfileRequestEntity.setRequestId(businessProfileUpdateRequest.getRequestId());
@@ -119,6 +130,7 @@ public class ProfileValidationServiceTest {
         .thenReturn(ProductValidationHelper.createProfileRequestProductValidations(3, businessProfileUpdateRequest.getRequestId(), ApprovalStatus.APPROVED));
     when(_profileProductValidationService.saveBusinessProfileRequestProductValidation(any()))
         .thenReturn(businessProfileRequestProductValidation);
+    when(_businessProfilePatchMapper.toPatchRequest(any())).thenReturn(profilePatch);
 
 
     boolean requestValidated = profileValidationService.validateRequest(businessProfileUpdateRequest);
@@ -128,11 +140,11 @@ public class ProfileValidationServiceTest {
 
   @Test
   public void testApproveRequest_ValidationFails() {
-
+    BusinessProfilePatchRequest profilePatch = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
     BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
     BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.CREATE);
+        ProfileRequestHelper.createBusinessProfileRequest(profilePatch, RequestType.CREATE);
     BusinessProfileRequestEntity businessProfileRequestEntity =
         ProfileRequestHelper.createBusinessProfileRequestEntity(profileEntity, RequestType.CREATE, ApprovalStatus.APPROVED);
     businessProfileRequestEntity.setRequestId(businessProfileUpdateRequest.getRequestId());

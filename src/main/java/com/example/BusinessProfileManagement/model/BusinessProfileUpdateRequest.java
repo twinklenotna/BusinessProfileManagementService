@@ -6,17 +6,19 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BusinessProfileUpdateRequest {
+  @NonNull
   private String profileId;
   private String requestId;
   private ApprovalStatus status;
   private RequestType requestType;
   private String comments;
-  private BusinessProfile businessProfile;
+  private BusinessProfilePatchRequest businessProfile;
   private Set<String> subscriptions;
 }

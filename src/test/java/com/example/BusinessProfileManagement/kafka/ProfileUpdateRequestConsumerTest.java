@@ -30,10 +30,10 @@ public class ProfileUpdateRequestConsumerTest {
   @Test
   public void testConsumeProfileUpdateRequest() {
     BusinessProfileUpdateRequest request = ProfileRequestHelper.createBusinessProfileRequest(
-        ProfileHelper.createBusinessProfile("1234"), RequestType.CREATE
+        ProfileHelper.createBusinessProfilePatchRequest("1234"), RequestType.CREATE
     );
     request.setRequestId("testRequestId");
-    request.setProfileId("testProfileId");
+    request.setProfileId("testprofileId");
 
     profileUpdateRequestConsumer.consumeProfileUpdateRequest(request);
     doNothing().when(_businessProfileRequestContext).processRequest(request);

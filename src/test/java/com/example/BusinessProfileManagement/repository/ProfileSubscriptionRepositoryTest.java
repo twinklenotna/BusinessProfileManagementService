@@ -27,7 +27,7 @@ public class ProfileSubscriptionRepositoryTest {
   @Test
   public void testSave() {
     ProfileSubscriptionEntity entity = new ProfileSubscriptionEntity();
-    entity.setProfileId("testProfileId");
+    entity.setProfileId("testprofileId");
 
     doNothing().when(dynamoDBMapper).save(entity);
 
@@ -40,7 +40,7 @@ public class ProfileSubscriptionRepositoryTest {
 
   @Test
   public void testGetProfileById() {
-    String profileId = "testProfileId";
+    String profileId = "testprofileId";
 
     ProfileSubscriptionEntity entity = new ProfileSubscriptionEntity();
     entity.setProfileId(profileId);

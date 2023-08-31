@@ -74,7 +74,7 @@ public class BusinessProfileUpdateRequestRepositoryTest {
   }
 
   @Test
-  public void testFindByProfileId() {
+  public void testFindByprofileId() {
     BusinessProfileRequestEntity expectedEntity = ProfileRequestHelper.createBusinessProfileRequestEntity(PROFILE_ID);
 
     List<BusinessProfileRequestEntity> expectedResult = Arrays.asList(expectedEntity);
@@ -85,7 +85,7 @@ public class BusinessProfileUpdateRequestRepositoryTest {
         .thenReturn(mock(PaginatedQueryList.class, withSettings().defaultAnswer(new ForwardsInvocations(expectedResult))));
 
 
-    List<BusinessProfileRequestEntity> results = repository.findByProfileId(PROFILE_ID);
+    List<BusinessProfileRequestEntity> results = repository.findByprofileId(PROFILE_ID);
 
     assertNotNull(results);
     assertEquals(1, results.size());

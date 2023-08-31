@@ -28,7 +28,7 @@ public class SubscriptionControllerTest {
 
     ResponseEntity<String> response = controller.subscribe(profileSubscription);
 
-    assertEquals(202, response.getStatusCodeValue());
+    assertEquals(202, response.getStatusCode().value());
     assertEquals("Profile subscription request accepted.", response.getBody());
 
     verify(profileSubscriptionService, times(1)).subscribe(profileSubscription);
@@ -36,7 +36,7 @@ public class SubscriptionControllerTest {
 
   @Test
   public void testGetSubscriptions() {
-    String profileId = "testProfileId";
+    String profileId = "testprofileId";
     Set<String> subscriptions = new HashSet<>();
     subscriptions.add("subscription1");
     subscriptions.add("subscription2");
@@ -45,7 +45,7 @@ public class SubscriptionControllerTest {
 
     ResponseEntity<Set<String>> response = controller.getSubscriptions(profileId);
 
-    assertEquals(200, response.getStatusCodeValue());
+    assertEquals(200, response.getStatusCode().value());
     assertEquals(subscriptions, response.getBody());
 
     verify(profileSubscriptionService, times(1)).getSubscriptions(profileId);

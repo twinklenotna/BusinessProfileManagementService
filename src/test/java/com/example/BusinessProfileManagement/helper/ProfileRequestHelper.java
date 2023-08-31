@@ -1,6 +1,7 @@
 package com.example.BusinessProfileManagement.helper;
 
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
@@ -17,14 +18,14 @@ import java.util.UUID;
 public class ProfileRequestHelper {
 
   public static BusinessProfileUpdateRequest createBusinessProfileRequest(String profileId) {
-    return createBusinessProfileRequest(ProfileHelper.createBusinessProfile(profileId), RequestType.UPDATE);
+    return createBusinessProfileRequest(ProfileHelper.createBusinessProfilePatchRequest(profileId), RequestType.UPDATE);
   }
 
   public static BusinessProfileUpdateRequest createBusinessProfileRequest(String profileId, RequestType request) {
-    return createBusinessProfileRequest(ProfileHelper.createBusinessProfile(profileId), request);
+    return createBusinessProfileRequest(ProfileHelper.createBusinessProfilePatchRequest(profileId), request);
   }
 
-  public static BusinessProfileUpdateRequest createBusinessProfileRequest(BusinessProfile businessProfile, RequestType requestType) {
+  public static BusinessProfileUpdateRequest createBusinessProfileRequest(BusinessProfilePatchRequest businessProfile, RequestType requestType) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest = new BusinessProfileUpdateRequest();
     businessProfileUpdateRequest.setBusinessProfile(businessProfile);
     businessProfileUpdateRequest.setProfileId(businessProfile.getProfileId());
@@ -85,7 +86,7 @@ public class ProfileRequestHelper {
     List<BusinessProfileUpdateRequest> businessProfileUpdateRequests = new ArrayList<>();
     for (int i = 0; i < requests; i++) {
       businessProfileUpdateRequests.add(
-          createBusinessProfileRequest(ProfileHelper.createBusinessProfile(profileId), RequestType.UPDATE));
+          createBusinessProfileRequest(ProfileHelper.createBusinessProfilePatchRequest(profileId), RequestType.UPDATE));
     }
     return businessProfileUpdateRequests;
   }

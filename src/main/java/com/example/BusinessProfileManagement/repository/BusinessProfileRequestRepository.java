@@ -23,7 +23,7 @@ public class BusinessProfileRequestRepository {
     return businessProfileRequestEntity;
   }
 
-  public List<BusinessProfileRequestEntity> findByProfileId(String profileId) {
+  public List<BusinessProfileRequestEntity> findByprofileId(String profileId) {
     String gsiName = "profileId-index";
 
     BusinessProfileRequestEntity businessProfileRequestEntity = new BusinessProfileRequestEntity();

@@ -3,6 +3,7 @@ package com.example.BusinessProfileManagement.controller;
 import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundException;
 import com.example.BusinessProfileManagement.exception.BusinessProfileRequestNotFoundException;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileRequestResponse;
 import com.example.BusinessProfileManagement.service.BusinessProfileService;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,19 +33,18 @@ public class BusinessProfileController {
 
 
   @PostMapping
-  public ResponseEntity<String> createProfile(@RequestBody BusinessProfile profile) {
-    String profileId = profileService.createProfileRequest(profile).getProfileId();
-    return ResponseEntity.created(URI.create("/profiles/" + profileId))
-            .body(profileId);
+  public ResponseEntity<BusinessProfile> createProfile(@RequestBody BusinessProfile profile) {
+    BusinessProfile profileCreated = profileService.createProfileRequest(profile);
+    return ResponseEntity.created(URI.create("/profiles/" + profileCreated.getProfileId()))
+            .body(profileCreated);
   }
 
-  @PutMapping("/{profileId}")
-  public ResponseEntity<String> updateProfile(@PathVariable String profileId, @RequestBody BusinessProfile profile) {
+  @PatchMapping("/{profileId}")
+  public ResponseEntity<String> updateProfile(@PathVariable String profileId, @RequestBody BusinessProfilePatchRequest profile) {
     profile.setProfileId(profileId);
     String requestId = profileService.updateProfile(profile);
     return ResponseEntity.accepted().body(requestId);
   }
-
 
   @GetMapping("/{profileId}")
   public ResponseEntity<BusinessProfile> getProfile(@PathVariable String profileId) {
@@ -67,7 +68,7 @@ public class BusinessProfileController {
 
   @GetMapping("/{profileId}/requests")
   public ResponseEntity<List<BusinessProfileUpdateRequest>> getProfileUpdateRequests(@PathVariable String profileId) {
-    List<BusinessProfileUpdateRequest> requests = profileRequestService.getProfileUpdateRequestsByProfileId(profileId);
+    List<BusinessProfileUpdateRequest> requests = profileRequestService.getProfileUpdateRequestsByprofileId(profileId);
     return ResponseEntity.ok(requests);
   }
 

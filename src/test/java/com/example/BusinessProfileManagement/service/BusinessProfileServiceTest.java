@@ -5,6 +5,7 @@ import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.kafka.ProfileUpdateRequestProducer;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
@@ -45,7 +46,7 @@ public class BusinessProfileServiceTest {
 
   @Test
   public void testUpdateProfile() {
-    BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
+    BusinessProfilePatchRequest profile = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
 
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
         ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.UPDATE);
@@ -74,8 +75,9 @@ public class BusinessProfileServiceTest {
 
   @Test
   public void testUpdateProfileWithSubscriptions() {
-    BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-    BusinessProfileUpdateRequest businessProfileUpdateRequest = ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE);
+    BusinessProfilePatchRequest profile = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
+        ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE);
 
     when(profileRequestService.createBusinessProfileRequest(eq(profile), eq(RequestType.SUBSCRIBE), any()))
         .thenReturn(businessProfileUpdateRequest);
@@ -86,22 +88,19 @@ public class BusinessProfileServiceTest {
     verify(profileUpdateRequestProducer, times(1)).sendProfileUpdateRequestWithKey(any(), any());
   }
 
-//  @Test
-//  public void testCreateProfileRequest() {
-//    BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
-//    BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
-//    BusinessProfileUpdateRequest businessProfileUpdateRequest =
-//        ProfileRequestHelper.createBusinessProfileRequest(profile, RequestType.CREATE);
-//
-//    when(profileRepository.save(any())).thenReturn(profileEntity);
-//    when(profileRequestService.createBusinessProfileRequest(profile, RequestType.CREATE, new HashSet<>()))
-//        .thenReturn(businessProfileUpdateRequest);
-//    when(businessProfileMapper.toEntity(profile)).thenReturn(profileEntity);
-//
-//    BusinessProfile profileId = businessProfileService.createProfileRequest(profile);
-//
-//    assertNotNull(profileId.getProfileId());
-//  }
+  @Test
+  public void testCreateProfileRequest() {
+    BusinessProfile profile = ProfileHelper.createBusinessProfile(PROFILE_ID);
+    BusinessProfileEntity profileEntity = ProfileHelper.createBusinessProfileEntity(PROFILE_ID);
+
+    when(profileRepository.save(any())).thenReturn(profileEntity);
+    when(businessProfileMapper.toEntity(profile)).thenReturn(profileEntity);
+    when(businessProfileMapper.toDto(profileEntity)).thenReturn(profile);
+
+    BusinessProfile profileId = businessProfileService.createProfileRequest(profile);
+
+    assertNotNull(profileId.getProfileId());
+  }
 
   @Test
   public void testDeleteProfile() {

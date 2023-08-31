@@ -33,7 +33,7 @@ public class ProfileUpdateRequestProducerTest {
   public void testSendProfileUpdateRequestWithKey() throws ExecutionException, InterruptedException {
     BusinessProfileUpdateRequest request = new BusinessProfileUpdateRequest();
     request.setRequestId("testRequestId");
-    request.setProfileId("testProfileId");
+    request.setProfileId("testprofileId");
     String key = "testKey";
 
     SendResult<String, BusinessProfileUpdateRequest> sendResult = new SendResult<>(null, null);

@@ -7,9 +7,11 @@ import com.example.BusinessProfileManagement.exception.BusinessProfileValidation
 import com.example.BusinessProfileManagement.helper.ProfileHelper;
 import com.example.BusinessProfileManagement.helper.ProfileRequestHelper;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.ProfileSubscription;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
+import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchMapper;
 import com.example.BusinessProfileManagement.service.BusinessProfileService;
 import com.example.BusinessProfileManagement.service.ProfileRequestService;
 import com.example.BusinessProfileManagement.service.ProfileSubscriptionService;
@@ -30,6 +32,8 @@ public class ConsumerStateTest {
   ProfileValidationService _profileValidationService;
   @Mock ProfileSubscriptionService _profileSubscriptionService;
   @Mock
+  BusinessProfilePatchMapper _businessProfilePatchMapper;
+  @Mock
   RejectedState _rejectedState;
   @Mock
   ApprovedState _approvedState;
@@ -48,14 +52,15 @@ public class ConsumerStateTest {
     BusinessProfileRequestContext context =
         new BusinessProfileRequestContext(
             new ApprovedState(
-                _businessProfileService, _profileRequestService, _profileSubscriptionService),
+                _businessProfileService, _profileRequestService, _profileSubscriptionService, _businessProfilePatchMapper),
             new FailedState(),
             new RejectedState(_profileRequestService),
             new InProgressState(_profileValidationService));
 
     BusinessProfile businessProfile = ProfileHelper.createBusinessProfile(PROFILE_ID);
+    BusinessProfilePatchRequest businessProfilePatch = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
     BusinessProfileUpdateRequest request =
-        ProfileRequestHelper.createBusinessProfileRequest(businessProfile, RequestType.SUBSCRIBE);
+        ProfileRequestHelper.createBusinessProfileRequest(businessProfilePatch, RequestType.SUBSCRIBE);
     ProfileSubscription profileSubscription = new ProfileSubscription(PROFILE_ID, request.getSubscriptions());
 
     when(_profileValidationService.validateRequest(request)).thenReturn(true);
@@ -64,7 +69,8 @@ public class ConsumerStateTest {
     verify(_profileValidationService, times(1)).validateRequest(eq(request));
     verify(_profileSubscriptionService, times(1)).addSubscriptions(eq(PROFILE_ID), eq(request.getSubscriptions()));
     verify(_profileRequestService, times(1)).updateBusinessProfileRequestEntity(any());
-    verify(_businessProfileService, times(1)).updateBusinessProfileEntity(request.getBusinessProfile());
+    verify(_businessProfileService, times(1))
+        .updateBusinessProfileEntity(any());
   }
 
   @Test
@@ -72,14 +78,14 @@ public class ConsumerStateTest {
     BusinessProfileRequestContext context =
         new BusinessProfileRequestContext(
             new ApprovedState(
-                _businessProfileService, _profileRequestService, _profileSubscriptionService),
+                _businessProfileService, _profileRequestService, _profileSubscriptionService, _businessProfilePatchMapper ),
             new FailedState(),
             new RejectedState(_profileRequestService),
             new InProgressState(_profileValidationService));
 
-    BusinessProfile businessProfile = ProfileHelper.createBusinessProfile(PROFILE_ID);
+    BusinessProfilePatchRequest businessProfilePatch = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
     BusinessProfileUpdateRequest request =
-        ProfileRequestHelper.createBusinessProfileRequest(businessProfile, RequestType.SUBSCRIBE);
+        ProfileRequestHelper.createBusinessProfileRequest(businessProfilePatch, RequestType.SUBSCRIBE);
 
     when(_profileValidationService.validateRequest(request)).thenReturn(false);
     context.processRequest(request);
@@ -94,14 +100,14 @@ public class ConsumerStateTest {
     BusinessProfileRequestContext context =
         new BusinessProfileRequestContext(
             new ApprovedState(
-                _businessProfileService, _profileRequestService, _profileSubscriptionService),
+                _businessProfileService, _profileRequestService, _profileSubscriptionService, _businessProfilePatchMapper),
             new FailedState(),
             new RejectedState(_profileRequestService),
             new InProgressState(_profileValidationService));
 
-    BusinessProfile businessProfile = ProfileHelper.createBusinessProfile(PROFILE_ID);
+    BusinessProfilePatchRequest businessProfilePatch = ProfileHelper.createBusinessProfilePatchRequest(PROFILE_ID);
     BusinessProfileUpdateRequest request =
-        ProfileRequestHelper.createBusinessProfileRequest(businessProfile, RequestType.SUBSCRIBE);
+        ProfileRequestHelper.createBusinessProfileRequest(businessProfilePatch, RequestType.SUBSCRIBE);
 
     when(_profileValidationService.validateRequest(request)).thenThrow(new BusinessProfileValidationException("validation failed"));
     assertThrows(BusinessProfileValidationException.class, () -> {
@@ -112,25 +118,5 @@ public class ConsumerStateTest {
     verify(_profileRequestService, times(0)).updateBusinessProfileRequestEntity(any());
     verify(_businessProfileService, times(0)).updateBusinessProfileEntity(any());
   }
-
-
-//  @Test
-//  public void testRejectedState() {
-//    BusinessProfileRequestContext context = new BusinessProfileRequestContext(
-//        new ApprovedState(_businessProfileService, _profileRequestService, _profileSubscriptionService),
-//        mock(FailedState.class),
-//        mock(RejectedState.class),
-//        mock(InProgressState.class)
-//    );
-//
-//    BusinessProfileRequest request = new BusinessProfileRequest();
-//    request.setRequestType(RequestType.SUBSCRIBE);
-//
-//    context.processRequest(request);
-//
-//    verify(_profileRequestService, times(1)).updateBusinessProfileRequestEntity(any());
-//    verify(_businessProfileService, times(0)).updateBusinessProfileEntity(any());
-//
-//  }
 }
 

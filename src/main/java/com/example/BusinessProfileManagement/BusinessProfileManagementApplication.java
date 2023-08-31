@@ -8,7 +8,6 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 @EnableCaching
-//@CircuitBreaker(name = "defaultApprovalStatus", fallbackMethod = "defaultApprovalStatus")
 public class BusinessProfileManagementApplication {
 
 	public static void main(String[] args) {

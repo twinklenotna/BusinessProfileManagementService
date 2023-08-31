@@ -5,7 +5,7 @@ import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequest
 import org.mapstruct.Mapper;
 
 
-@Mapper(componentModel = "spring", uses = BusinessProfileMapper.class)
+@Mapper(componentModel = "spring", uses = BusinessProfilePatchRequestMapper.class)
 public interface BusinessProfileRequestMapper {
   BusinessProfileUpdateRequest entityToDto(BusinessProfileRequestEntity entity);
 

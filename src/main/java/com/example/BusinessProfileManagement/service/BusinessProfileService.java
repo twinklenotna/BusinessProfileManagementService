@@ -3,11 +3,13 @@ package com.example.BusinessProfileManagement.service;
 import com.example.BusinessProfileManagement.exception.BusinessProfileNotFoundException;
 import com.example.BusinessProfileManagement.kafka.ProfileUpdateRequestProducer;
 import com.example.BusinessProfileManagement.model.BusinessProfile;
+import com.example.BusinessProfileManagement.model.BusinessProfilePatchRequest;
 import com.example.BusinessProfileManagement.model.BusinessProfileUpdateRequest;
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileEntity;
 import com.example.BusinessProfileManagement.model.enums.ProfileStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileMapper;
+import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestMapper;
 import com.example.BusinessProfileManagement.repository.BusinessProfileRepository;
 import java.util.HashSet;
@@ -30,13 +32,14 @@ public class BusinessProfileService {
   private final ProfileRequestService profileRequestService;
   private final ProfileUpdateRequestProducer profileUpdateRequestProducer;
   private final BusinessProfileMapper businessProfileMapper;
+  private final BusinessProfilePatchMapper businessProfilePatchMapper;
 
   /**
    * To update the BusinessProfile
    * @param profile Profile object containing the fields to be changed
    */
   @Transactional
-  public String updateProfile(BusinessProfile profile) {
+  public String updateProfile(BusinessProfilePatchRequest profile) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
         profileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>());
     logger.info("created profile request with id: " + businessProfileUpdateRequest.getRequestId());
@@ -50,9 +53,23 @@ public class BusinessProfileService {
    * @param subscriptions subscriptions against which we need to validate profile
    */
   @Transactional
-  public String updateProfile(BusinessProfile profile, Set<String> subscriptions) {
+  public String updateProfile(BusinessProfilePatchRequest profile, Set<String> subscriptions) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
         profileRequestService.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE, subscriptions);
+    sendProfileUpdateRequest(businessProfileUpdateRequest);
+    return businessProfileUpdateRequest.getRequestId();
+  }
+
+  /**
+   * Update the BusinessProfile and validate it against the subscriptions
+   * @param profile profileObject
+   * @param subscriptions subscriptions against which we need to validate profile
+   */
+  @Transactional
+  public String updateProfile(BusinessProfile profile, Set<String> subscriptions) {
+    BusinessProfileUpdateRequest businessProfileUpdateRequest =
+        profileRequestService.createBusinessProfileRequest(businessProfilePatchMapper.toPatchRequest(profile),
+            RequestType.SUBSCRIBE, subscriptions);
     sendProfileUpdateRequest(businessProfileUpdateRequest);
     return businessProfileUpdateRequest.getRequestId();
   }
@@ -74,7 +91,7 @@ public class BusinessProfileService {
 
   /**
    * Delete businessProfile associated with given profileId
-   * @param profileId profileID of the businessProfile
+   * @param profileId profileId of the businessProfile
    */
   @CacheEvict(value = "businessProfiles", key = "#profileId")
   public void deleteProfile(String profileId) {

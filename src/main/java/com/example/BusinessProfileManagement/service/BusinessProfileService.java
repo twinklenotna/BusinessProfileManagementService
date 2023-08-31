@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,10 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BusinessProfileService {
-  Logger logger = LoggerFactory.getLogger(ProfileSubscriptionService.class);
   private final BusinessProfileRepository profileRepository;
-  private final BusinessProfileRequestService _businessProfileRequestService;
+  private final BusinessProfileRequestService businessProfileRequestService;
   private final ProfileUpdateRequestProducer profileUpdateRequestProducer;
   private final BusinessProfileMapper businessProfileMapper;
   private final BusinessProfilePatchMapper businessProfilePatchMapper;
@@ -40,8 +41,8 @@ public class BusinessProfileService {
   @Transactional
   public BusinessProfileUpdateRequest updateProfile(BusinessProfilePatchRequest profile) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        _businessProfileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>());
-    logger.info("created profile request with id: " + businessProfileUpdateRequest.getRequestId());
+        businessProfileRequestService.createBusinessProfileRequest(profile, RequestType.UPDATE, new HashSet<>());
+    log.info("created profile request with id: " + businessProfileUpdateRequest.getRequestId());
     sendProfileUpdateRequest(businessProfileUpdateRequest);
     return businessProfileUpdateRequest;
   }
@@ -54,7 +55,7 @@ public class BusinessProfileService {
   @Transactional
   public String updateProfile(BusinessProfilePatchRequest profile, Set<String> subscriptions) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        _businessProfileRequestService.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE, subscriptions);
+        businessProfileRequestService.createBusinessProfileRequest(profile, RequestType.SUBSCRIBE, subscriptions);
     sendProfileUpdateRequest(businessProfileUpdateRequest);
     return businessProfileUpdateRequest.getRequestId();
   }
@@ -67,7 +68,7 @@ public class BusinessProfileService {
   @Transactional
   public String updateProfile(BusinessProfile profile, Set<String> subscriptions) {
     BusinessProfileUpdateRequest businessProfileUpdateRequest =
-        _businessProfileRequestService.createBusinessProfileRequest(businessProfilePatchMapper.toPatchRequest(profile),
+        businessProfileRequestService.createBusinessProfileRequest(businessProfilePatchMapper.toPatchRequest(profile),
             RequestType.SUBSCRIBE, subscriptions);
     sendProfileUpdateRequest(businessProfileUpdateRequest);
     return businessProfileUpdateRequest.getRequestId();
@@ -97,7 +98,7 @@ public class BusinessProfileService {
     try {
       profileRepository.delete(profileId);
     } catch (Exception ex) {
-      logger.warn("Business profile with id: " + profileId + " not found");
+      log.warn("Business profile with id: " + profileId + " not found");
       throw new BusinessProfileNotFoundException("Business profile with id: " + profileId + " not found");
     }
   }
@@ -111,7 +112,7 @@ public class BusinessProfileService {
   public BusinessProfile getProfileById(String profileId) {
     BusinessProfileEntity profileEntity = profileRepository.getProfileById(profileId);
     if(profileEntity == null) {
-      logger.warn("Business profile with id: " + profileId + " not found");
+      log.warn("Business profile with id: " + profileId + " not found");
       throw new BusinessProfileNotFoundException("Business profile with id: " + profileId + " not found");
     }
     return businessProfileMapper.toDto(profileEntity);

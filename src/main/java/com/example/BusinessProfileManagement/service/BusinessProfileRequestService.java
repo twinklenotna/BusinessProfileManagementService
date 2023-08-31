@@ -9,7 +9,6 @@ import com.example.BusinessProfileManagement.model.BusinessProfileRequestRespons
 import com.example.BusinessProfileManagement.model.entity.BusinessProfileRequestEntity;
 import com.example.BusinessProfileManagement.model.enums.ApprovalStatus;
 import com.example.BusinessProfileManagement.model.enums.RequestType;
-import com.example.BusinessProfileManagement.model.mapper.BusinessProfileMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfilePatchRequestMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestMapper;
 import com.example.BusinessProfileManagement.model.mapper.BusinessProfileRequestResponseMapper;
@@ -19,23 +18,26 @@ import java.util.List;
 import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BusinessProfileRequestService {
-  Logger logger = LoggerFactory.getLogger(BusinessProfileRequestService.class);
   private  final BusinessProfileRequestRepository businessProfileRequestRepository;
-  private  final BusinessProfileMapper businessProfileMapper;
   private  final BusinessProfileRequestMapper businessProfileRequestMapper;
-  private  final BusinessProfileProductValidationService _businessProfileProductValidationService;
+  private  final BusinessProfileProductValidationService businessProfileProductValidationService;
   private  final BusinessProfileRequestResponseMapper businessProfileRequestResponseMapper;
   private  final BusinessProfilePatchRequestMapper businessProfilePatchRequestMapper;
 
 
+  /**
+   * To get all the profile update requests for a profile
+   * @param profileId profileId
+   * @return List of profile update requests
+   */
   public List<BusinessProfileUpdateRequest> getProfileUpdateRequestsByprofileId(String profileId) {
     List<BusinessProfileRequestEntity> businessProfileRequestEntities = businessProfileRequestRepository.findByprofileId(profileId);
     List<BusinessProfileUpdateRequest> businessProfileUpdateRequests = new ArrayList<>();
@@ -45,25 +47,36 @@ public class BusinessProfileRequestService {
     return businessProfileUpdateRequests;
   }
 
+  /**
+   * To get the profile update request by requestId
+   * @param requestId requestId
+   * @return profile update request
+   */
   public BusinessProfileRequestResponse getProfileUpdateRequest(String requestId) {
     BusinessProfileRequestEntity requestEntity = businessProfileRequestRepository.findByRequestId(requestId);
     List<BusinessProfileRequestProductValidation> businessProfileRequestProductValidations =
-        _businessProfileProductValidationService.getRequestProductValidations(requestId);
+        businessProfileProductValidationService.getRequestProductValidations(requestId);
     if(requestEntity == null) {
-      logger.error("Business profile request with id: " + requestId + " not found");
+      log.error("Business profile request with id: " + requestId + " not found");
       throw new BusinessProfileRequestNotFoundException("Business profile request with id: " + requestId + " not found");
     }
     BusinessProfileRequestResponse response = businessProfileRequestResponseMapper.entityToDto(requestEntity);
     response.setSubscriptionValidations(businessProfileRequestProductValidations);
     return response;
   }
+
+  /**
+   * To update the status of the update profile request
+   * @param request request
+   * @param status status
+   */
   public void updateRequestStatus(BusinessProfileUpdateRequest request, ApprovalStatus status) {
     try {
       request.setStatus(status);
       updateBusinessProfileRequestEntity(request);
-      logger.info("Profile request: {} is updated with status: {}",request.getRequestId(),request.getStatus());
+      log.info("Profile request: {} is updated with status: {}",request.getRequestId(),request.getStatus());
     } catch(Exception ex) {
-      logger.error("Error happened while updating request with requestId: "+request.getRequestId()+" " +ex.getMessage());
+      log.error("Error happened while updating request with requestId: "+request.getRequestId()+" " +ex.getMessage());
       throw new BusinessProfileRequestException(
           "Error happened while updating request with requestId: "
               + request.getRequestId()
@@ -72,6 +85,13 @@ public class BusinessProfileRequestService {
     }
   }
 
+  /**
+   * To create a profile update request
+   * @param profile profile
+   * @param requestType requestType
+   * @param subscriptions subscriptions
+   * @return profile update request
+   */
   BusinessProfileUpdateRequest createBusinessProfileRequest(BusinessProfilePatchRequest profile, RequestType requestType, Set<String> subscriptions) {
     BusinessProfileRequestEntity requestEntity = new BusinessProfileRequestEntity();
     requestEntity.setBusinessProfile(businessProfilePatchRequestMapper.toEntity(profile));
@@ -80,10 +100,10 @@ public class BusinessProfileRequestService {
     requestEntity.setRequestType(requestType);
     requestEntity.setSubscriptions(subscriptions);
     try{
-      logger.info("Creating Profile request: {} with status: {}",requestEntity.getRequestId(),requestEntity.getStatus());
+      log.info("Creating Profile request: {} with status: {}",requestEntity.getRequestId(),requestEntity.getStatus());
        return businessProfileRequestMapper.entityToDto(businessProfileRequestRepository.saveAndUpdate(requestEntity));
     } catch(Exception ex) {
-      logger.error("Error happened while creating request with requestId for profileId: "+ profile.getProfileId() + " " +ex.getMessage());
+      log.error("Error happened while creating request with requestId for profileId: "+ profile.getProfileId() + " " +ex.getMessage());
       throw new RuntimeException("Error happened while creating request with requestId for profileId: "+ profile.getProfileId() + " " +ex.getMessage(), ex);
     }
   }

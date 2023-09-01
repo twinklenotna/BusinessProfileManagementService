@@ -137,10 +137,11 @@ public class BusinessProfileService {
    * @return profile Entity
    */
   @CachePut(value = "businessProfiles", key = "#profile.profileId")
-  public BusinessProfileEntity updateBusinessProfileEntity(BusinessProfile profile) {
+  public BusinessProfile updateBusinessProfileEntity(BusinessProfile profile) {
     BusinessProfileEntity profileEntity = businessProfileMapper.toEntity(profile);
     profileEntity.setStatus(ProfileStatus.ACTIVE);
-    return profileRepository.save(profileEntity);
+    profileEntity =  profileRepository.save(profileEntity);
+    return businessProfileMapper.toDto(profileEntity);
   }
 
   /**
